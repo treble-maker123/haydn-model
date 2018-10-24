@@ -1,2 +1,5 @@
 # Visual Studio Code configuration
 .vscode
+
+# Load data through the import.py script
+data/
