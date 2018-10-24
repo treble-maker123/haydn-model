@@ -2,4 +2,8 @@
 .vscode
 
 # Load data through the import.py script
-data/
+data/*
+# Need index.json
+!data/index.json
+
+**/__pychache__

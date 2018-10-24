@@ -1,0 +1,32 @@
+{
+	"source": "http://www.kunstderfuge.com/haydn.htm#String+Quartets",
+	"works": [
+		{
+			"key": "Bb Major",
+			"catalogue": "H III:1",
+			"copyright": "Steven Edwards",
+			"movements": [
+				{
+					"tempo": "Presto",
+					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_1_(c)edwards.mid"
+				},
+				{
+					"tempo": "Minuetto",
+					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_2_(c)edwards.mid"
+				},
+				{
+					"tempo": "Adagio",
+					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_3_(c)edwards.mid"
+				},
+				{
+					"tempo": "Minuetto",
+					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_4_(c)edwards.mid"
+				},
+				{
+					"tempo": "Presto",
+					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_5_(c)edwards.mid"
+				}
+			]
+		}
+	]
+}
