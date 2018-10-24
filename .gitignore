@@ -6,4 +6,9 @@ data/*
 # Need index.json
 !data/index.json
 
-**/__pychache__
+# No pycache
+__pycache__/
+
+# Mac files
+.DS_Store
+**/.DS_Store
