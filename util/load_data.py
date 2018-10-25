@@ -92,14 +92,15 @@ def __download_file__(url, name, path, verbose=True):
     '''
     assert path[-1] == '/', "The path must end with '/'."
     try:
-        # TODO: Add conditions if this hits daily limit
-        filename, _ = req.urlretrieve(url, path + name)
+        filename, headers = req.urlretrieve(url, path + name)
+        if headers.get_content_type() != 'audio/midi':
+          raise Exception("Downloaded file content type is not audio/midi, daily limit may be reached.")
         if verbose:
             print("Downloaded to {}".format(filename))
         return True, None
     except Exception as error:
         if verbose:
-            print("Failed to download {} with the following error: \n".format(url, error))
+            print("Failed to download {} with the following error: {}.".format(url, error))
         return False, error
 
 def __get_file_name__(key, catalogue, mvmt):
