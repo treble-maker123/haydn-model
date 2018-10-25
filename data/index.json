@@ -8,23 +8,28 @@
 			"movements": [
 				{
 					"tempo": "Presto",
-					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_1_(c)edwards.mid"
+          "url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_1_(c)edwards.mid",
+          "downloaded": "True"
 				},
 				{
 					"tempo": "Minuetto",
-					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_2_(c)edwards.mid"
+          "url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_2_(c)edwards.mid",
+          "downloaded": "True"
 				},
 				{
 					"tempo": "Adagio",
-					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_3_(c)edwards.mid"
+          "url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_3_(c)edwards.mid",
+          "downloaded": "True"
 				},
 				{
 					"tempo": "Minuetto",
-					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_4_(c)edwards.mid"
+          "url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_4_(c)edwards.mid",
+          "downloaded": "True"
 				},
 				{
 					"tempo": "Presto",
-					"url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_5_(c)edwards.mid"
+          "url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_5_(c)edwards.mid",
+          "downloaded": "True"
 				}
 			]
 		}

@@ -30,7 +30,7 @@ def download_data(max_download=5, pause=1, verbose=True):
 
             name = __get_file_name__(work['key'], work['catalogue'], i + 1)
             downloaded_files = __get_all_downloaded_file_names__()
-            if name in downloaded_files:
+            if name in downloaded_files or bool(mvmt.get('downloaded', False)):
                 if verbose:
                     print("Already downloaded {}, skipped.".format(name))
                 continue
