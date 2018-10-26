@@ -12,7 +12,7 @@
           "downloaded": "True"
 				},
 				{
-					"tempo": "Minuetto",
+					"tempo": "Minuettoo",
           "url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_2_(c)edwards.mid",
           "downloaded": "True"
 				},
@@ -22,7 +22,7 @@
           "downloaded": "True"
 				},
 				{
-					"tempo": "Minuetto",
+					"tempo": "Minuettoo",
           "url": "http://kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_1_4_(c)edwards.mid",
           "downloaded": "True"
 				},
@@ -32,6 +32,38 @@
           "downloaded": "True"
 				}
 			]
-		}
+    },
+    {
+      "key": "Eb Major",
+      "catalogue": "2",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+					"tempo": "Allegro molto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_2_1_(c)edwards.mid",
+          "downloaded": "True"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_2_2_(c)edwards.mid",
+          "downloaded": "True"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_2_3_(c)edwards.mid",
+          "downloaded": "True"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_2_4_(c)edwards.mid",
+          "downloaded": "True"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_2_5_(c)edwards.mid",
+          "downloaded": "True"
+        }
+      ]
+    }
 	]
 }

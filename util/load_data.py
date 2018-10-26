@@ -3,8 +3,6 @@ import json
 from time import sleep
 from urllib import request as req
 
-# score = conv.parse('data/string_quartet_1_1_(c)edwards.mid')
-
 def download_data(max_download=5, pause=1, verbose=True):
     '''
     Download the data specified in /data/index.json into the data directory. This method will skip downloads if it finds that the work exists in the data directory already. The names of the files has the following structure (spaces are replaced with "_"),
