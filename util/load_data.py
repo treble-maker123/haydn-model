@@ -8,7 +8,7 @@ from urllib import request as req
 def download_data(max_download=5, pause=1, verbose=True):
     '''
     Download the data specified in /data/index.json into the data directory. This method will skip downloads if it finds that the work exists in the data directory already. The names of the files has the following structure (spaces are replaced with "_"),
-        key_catalogue_mvmt.mid
+        key_catalogue_m.mid
 
     Args:
         max_download (int): The maximum number of works to download from the index.json,
@@ -106,7 +106,7 @@ def __download_file__(url, name, path, verbose=True):
 def __get_file_name__(key, catalogue, mvmt):
     '''
     Returns a string containing the name for the given work. The file name has the following structure,
-        key_catalogue_mvmt.mid
+        key_catalogue_m.mid
 
     Args:
         key (string): The "key" attribute of the work,
@@ -117,7 +117,7 @@ def __get_file_name__(key, catalogue, mvmt):
         string: Name given to the file.
     '''
     assert mvmt != 0, "Movement must start at 1, use n+1."
-    out = key + "_" + catalogue +"_mvmt_" + str(mvmt) + ".mid"
+    out = key + "_" + catalogue +"_m" + str(mvmt) + ".mid"
     return out.replace(" ", "_")
 
 def __load_index__():
