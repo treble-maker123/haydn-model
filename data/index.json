@@ -96,6 +96,38 @@
           "downloaded": "True"
         }
       ]
+    },
+    {
+      "key": "G Major",
+      "catalogue": "4",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_4_1_(c)edwards.mid",
+          "downloaded": "True"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_4_2_(c)edwards.mid",
+          "downloaded": "True"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_4_3_(c)edwards.mid",
+          "downloaded": "True"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_4_4_(c)edwards.mid",
+          "downloaded": "True"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_4_5_(c)edwards.mid",
+          "downloaded": "True"
+        }
+      ]
     }
 	]
 }
