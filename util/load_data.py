@@ -34,7 +34,8 @@ def download_data(max_download=5, pause=1, verbose=True):
                 continue
 
             url = mvmt['url']
-            __download_file__(url, name, "data/", verbose)
+            success, _ = __download_file__(url, name, "data/", verbose)
+            if not success: return print("Terminating download.")
             downloaded += 1
             sleep(pause)
 
@@ -92,6 +93,7 @@ def __download_file__(url, name, path, verbose=True):
     try:
         filename, headers = req.urlretrieve(url, path + name)
         if headers.get_content_type() != 'audio/midi':
+          os.remove(path + name)
           raise Exception("Downloaded file content type is not audio/midi, daily limit may be reached.")
         if verbose:
             print("Downloaded to {}".format(filename))
