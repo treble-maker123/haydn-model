@@ -130,3 +130,6 @@ def __load_index__():
         index = json.loads(content)
 
     return index
+
+if __name__ == '__main__':
+  download_data()
