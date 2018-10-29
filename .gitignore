@@ -12,3 +12,6 @@ __pycache__/
 # Mac files
 .DS_Store
 **/.DS_Store
+
+# No notebook checkpoints
+.ipynb_checkpoints/
