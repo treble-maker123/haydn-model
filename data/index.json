@@ -182,6 +182,327 @@
           "downloaded": "True"
         }
       ]
+    },
+    {
+      "key": "A Major",
+      "catalogue": "7",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_7_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_7_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Poco Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_7_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_7_4_(c)edwards.mid"
+        },
+        {
+          "tempo": "Allegro molto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_7_5_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "E Major",
+      "catalogue": "8",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_8_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_8_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_8_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_8_4_(c)edwards.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_8_5_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "Eb Major",
+      "catalogue": "9",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Allegro molto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_9_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_9_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_9_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_9_4_(c)edwards.mid"
+        },
+        {
+          "tempo": "Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_9_5_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "F Major",
+      "catalogue": "10",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_10_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_10_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Poco Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_10_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_10_4_(c)edwards.mid"
+        },
+        {
+          "tempo": "Allegro molto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_10_5_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "D Major",
+      "catalogue": "11",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_11_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_11_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Largo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_11_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_11_4_(c)edwards.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_11_5_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "Bb Major",
+      "catalogue": "12",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_12_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_12_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_12_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_12_4_(c)edwards.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_12_5_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "E Major",
+      "catalogue": "13",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Allegro molto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_13_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_13_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Andantino",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_13_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_13_4_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "C Major",
+      "catalogue": "14",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Andante",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_14_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_14_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_14_3_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "G Major",
+      "catalogue": "15",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_15_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Largo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_15_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_15_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_15_4_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "Bb Major",
+      "catalogue": "16",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Allegro moderato",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_16_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_16_2_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "F Major",
+      "catalogue": "17",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_17_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Andante cantabile",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_17_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_17_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_17_4_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "A Major",
+      "catalogue": "18",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_18_1_(c)edwards.mid"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_18_2_(c)edwards.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_18_3_(c)edwards.mid"
+        },
+        {
+          "tempo": "Scherzando",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/edwards/string_quartet_18_4_(c)edwards.mid"
+        }
+      ]
+    },
+    {
+      "key": "Eb Major",
+      "catalogue": "31",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_20_1_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "C Major",
+      "catalogue": "32",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_20_2_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "C Major",
+      "catalogue": "32",
+      "copyright": "Steven Edwards",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_20_2_(c)harfesoft.mid"
+        }
+      ]
     }
 	]
 }
