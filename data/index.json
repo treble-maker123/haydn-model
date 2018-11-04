@@ -474,7 +474,7 @@
     {
       "key": "Eb Major",
       "catalogue": "31",
-      "copyright": "Steven Edwards",
+      "copyright": "HarfeSoft.de",
       "movements": [
         {
           "tempo": "Presto",
@@ -485,7 +485,7 @@
     {
       "key": "C Major",
       "catalogue": "32",
-      "copyright": "Steven Edwards",
+      "copyright": "HarfeSoft.de",
       "movements": [
         {
           "tempo": "Presto",
@@ -494,13 +494,464 @@
       ]
     },
     {
-      "key": "C Major",
-      "catalogue": "32",
-      "copyright": "Steven Edwards",
+      "key": "g minor",
+      "catalogue": "33",
+      "copyright": "HarfeSoft.de",
       "movements": [
         {
           "tempo": "Presto",
-          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_20_2_(c)harfesoft.mid"
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_20_3_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "D Major",
+      "catalogue": "34",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_20_4_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "f minor",
+      "catalogue": "35",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_20_5_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "A Major",
+      "catalogue": "36",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_20_6_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "b minor",
+      "catalogue": "37",
+      "copyright": "Nausica Th. Classical",
+      "movements": [
+        {
+          "tempo": "Allegro moderato",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_1_1_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Scherzo: Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_1_2_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Andante",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_1_3_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_1_4_(c)simonetto.mid"
+        }
+      ]
+    },
+    {
+      "key": "Eb Major",
+      "catalogue": "38",
+      "copyright": "Nausica Th. Classical",
+      "movements": [
+        {
+          "tempo": "Allegro moderato",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_2_1_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Scherzo: Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_2_2_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Largo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_2_3_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_2_4_(c)simonetto.mid"
+        }
+      ]
+    },
+    {
+      "key": "C Major",
+      "catalogue": "39",
+      "copyright": "Nausica Th. Classical",
+      "movements": [
+        {
+          "tempo": "Allegro moderato",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_3_1_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Scherzo: Allegretto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_3_2_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_3_3_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_3_4_(c)simonetto.mid"
+        }
+      ]
+    },
+    {
+      "key": "G Major",
+      "catalogue": "41",
+      "copyright": "Nausica Th. Classical",
+      "movements": [
+        {
+          "tempo": "Vivace assai",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_5_1_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Largo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_5_2_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Allgro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_5_3_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Allegretto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_5_4_(c)simonetto.mid"
+        }
+      ]
+    },
+    {
+      "key": "D Major",
+      "catalogue": "42",
+      "copyright": "Nausica Th. Classical",
+      "movements": [
+        {
+          "tempo": "Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_6_1_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Andante",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_6_2_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Allegretto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_6_3_(c)simonetto.mid"
+        },
+        {
+          "tempo": "Allegretto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=haydn/simonetto/quartet_33_6_4_(c)simonetto.mid"
+        }
+      ]
+    },
+    {
+      "key": "d minor",
+      "catalogue": "43",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_42_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "D Major",
+      "catalogue": "49",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_50_6_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "D Major",
+      "catalogue": "49",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_50_6_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "C Major",
+      "catalogue": "57",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_54_2_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "G Major",
+      "catalogue": "58",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_54_1_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "E Major",
+      "catalogue": "59",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_54_3_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "D Major",
+      "catalogue": "63",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_64_4_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "G Major",
+      "catalogue": "66",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_64_4_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "Bb Major",
+      "catalogue": "67",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_64_3_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "b minor",
+      "catalogue": "68",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_64_2_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "C Major",
+      "catalogue": "72",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_74_1_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "F Major",
+      "catalogue": "73",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_74_2_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "g minor",
+      "catalogue": "74",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_74_3_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "G Major",
+      "catalogue": "75",
+      "copyright": "HarfeSoft.de",
+      "movements": [
+        {
+          "tempo": "Allegro con spirito",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_1_score_1_(c)unknown.mid"
+        },
+        {
+          "tempo": "Adagio sustenuto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_1_score_2_(c)unknown.mid"
+        },
+        {
+          "tempo": "Minuetto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_1_score_3_(c)unknown.mid"
+        },
+        {
+          "tempo": "Allegro ma non troppo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_1_score_4_(c)unknown.mid"
+        }
+      ]
+    },
+    {
+      "key": "d minor",
+      "catalogue": "76",
+      "copyright": "Anonymous",
+      "movements": [
+        {
+          "tempo": "Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_2_score_1_(c)unknown.mid"
+        },
+        {
+          "tempo": "Andante",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_2_score_2_(c)unknown.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_2_score_3_(c)unknown.mid"
+        },
+        {
+          "tempo": "Vivace",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_2_score_4_(c)unknown.mid"
+        }
+      ]
+    },
+    {
+      "key": "C Major",
+      "catalogue": "77",
+      "copyright": "Anonymous",
+      "movements": [
+        {
+          "tempo": "Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_3_score_1_(c)unknown.mid"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_3_score_2_(c)unknown.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_3_score_3_(c)unknown.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_3_score_4_(c)unknown.mid"
+        }
+      ]
+    },
+    {
+      "key": "Bb Major",
+      "catalogue": "78",
+      "copyright": "Anonymous",
+      "movements": [
+        {
+          "tempo": "Allegro con spirito",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_4_score_1_(c)unknown.mid"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_4_score_2_(c)unknown.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_4_score_3_(c)unknown.mid"
+        },
+        {
+          "tempo": "Allegro ma non troppo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_4_score_4_(c)unknown.mid"
+        }
+      ]
+    },
+    {
+      "key": "D Major",
+      "catalogue": "79",
+      "copyright": "Anonymous",
+      "movements": [
+        {
+          "tempo": "Allegro",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_5_score_1_(c)unknown.mid"
+        },
+        {
+          "tempo": "Largo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_5_score_2_(c)unknown.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_5_score_3_(c)unknown.mid"
+        },
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_5_score_4_(c)unknown.mid"
+        }
+      ]
+    },
+    {
+      "key": "Eb Major",
+      "catalogue": "80",
+      "copyright": "Anonymous",
+      "movements": [
+        {
+          "tempo": "Allegretto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_6_score_1_(c)unknown.mid"
+        },
+        {
+          "tempo": "Adagio",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_6_score_2_(c)unknown.mid"
+        },
+        {
+          "tempo": "Minuettoo",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_6_score_3_(c)unknown.mid"
+        },
+        {
+          "tempo": "Allegro spirituoso",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=18/haydn_string_quartet_76_6_score_4_(c)unknown.mid"
+        }
+      ]
+    },
+    {
+      "key": "G Major",
+      "catalogue": "81",
+      "copyright": "Anonymous",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_77_1_(c)harfesoft.mid"
+        }
+      ]
+    },
+    {
+      "key": "F Major",
+      "catalogue": "82",
+      "copyright": "Anonymous",
+      "movements": [
+        {
+          "tempo": "Presto",
+          "url": "http://www.kunstderfuge.com/-/midi.asp?file=24/haydn_string_quartet_77_2_(c)harfesoft.mid"
         }
       ]
     }
