@@ -61,5 +61,4 @@ class HaydnQuartetRawDataset(Dataset):
     return result, score_or_fn
 
 if __name__ == '__main__':
-  dataset = HaydnQuartetRawDataset(filtered=False,
-                                   transform=ToTensorWithoutRhythm)
+  dataset = HaydnQuartetRawDataset(transform=ToTensorWithoutRhythm)
