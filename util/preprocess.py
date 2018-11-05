@@ -31,7 +31,8 @@ class HaydnQuartetDataset(Dataset):
       output = pool.map(self.__has_four_parts__, self.score_names)
       pool.close()
       pool.join()
-      self.score_names = [ score for four_parts, score in output if four_parts]
+      score_names = [ score for four_parts, score in output if four_parts]
+      self.score_names = score_names
     else:
       need_four_parts = filter(self.__has_four_parts__, self.score_names)
       self.score_names = list(need_four_parts)
