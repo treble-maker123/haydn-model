@@ -4,15 +4,19 @@ from music21 import converter
 from music21.stream import Score
 from time import time
 from multiprocessing import Pool
+from preprocess import Transform, ToTensorWithoutRhythm
 
 class HaydnQuartetRawDataset(Dataset):
   '''
   A class for interacting with the dataset. All preprocessing classes can inherit this class.
   '''
 
-  def __init__(self, data_dir="data/scores", filtered=True):
-    self.data_dir = data_dir
-    self.score_names = os.listdir('data/scores')
+  def __init__(self, **kwargs):
+    transform = kwargs.get('transform', None)
+    filtered = kwargs.get('filtered', True)
+    self.data_dir = kwargs.get('data_dir', "data/scores")
+    self.score_names = os.listdir(self.data_dir)
+    if transform.__bases__[0] is Transform: self.transform = transform()
     if len(self.score_names) == 0: raise Exception("No scores found!")
     if filtered: self.__filter_scores__()
 
@@ -20,7 +24,9 @@ class HaydnQuartetRawDataset(Dataset):
     return len(self.score_names)
 
   def __getitem__(self, idx):
-    return converter.thaw(self.__get_path__(self.score_names[idx]))
+    score = converter.thaw(self.__get_path__(self.score_names[idx]))
+    if self.transform: score = self.transform(score)
+    return score
 
   def __filter_scores__(self, multi_proc=True):
     start = time()
@@ -55,4 +61,5 @@ class HaydnQuartetRawDataset(Dataset):
     return result, score_or_fn
 
 if __name__ == '__main__':
-  dataset = HaydnQuartetRawDataset()
+  dataset = HaydnQuartetRawDataset(filtered=False,
+                                   transform=ToTensorWithoutRhythm)
