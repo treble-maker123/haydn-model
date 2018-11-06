@@ -10,7 +10,7 @@ class ToTensorWithoutRhythm(Transform):
     Converts the sample clip to a simple tensor that contain only pitches and no duration.
     '''
     # allowed pitch range, all pitches beyond range is clipped.
-    _, upper_bound = 0, 88
+    _, upper_bound = 12, 100
     max_len = max(len(sample.parts[0].notes),
                   len(sample.parts[1].notes),
                   len(sample.parts[2].notes),

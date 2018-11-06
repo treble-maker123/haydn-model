@@ -16,7 +16,10 @@ class HaydnQuartetRawDataset(Dataset):
     filtered = kwargs.get('filtered', True)
     self.data_dir = kwargs.get('data_dir', "data/scores")
     self.score_names = os.listdir(self.data_dir)
-    if transform.__bases__[0] is Transform: self.transform = transform()
+    if transform and transform.__bases__[0] is Transform:
+      self.transform = transform() # used in __getitem__()
+    else:
+      self.transform = None
     if len(self.score_names) == 0: raise Exception("No scores found!")
     if filtered: self.__filter_scores__()
 
@@ -28,29 +31,44 @@ class HaydnQuartetRawDataset(Dataset):
     if self.transform: score = self.transform(score)
     return score
 
-  def __filter_scores__(self, multi_proc=True):
-    start = time()
-    print("Filtering by number of parts...")
-    if multi_proc:
-      num_proc = max(1, os.cpu_count() - 1)
-      pool = Pool(num_proc)
-      output = pool.map(self.__has_four_parts__, self.score_names)
-      pool.close()
-      pool.join()
-      score_names = [ score for four_parts, score in output if four_parts]
-      self.score_names = score_names
-    else:
-      need_four_parts = filter(self.__has_four_parts__, self.score_names)
-      self.score_names = list(need_four_parts)
-    print("Took {:.2f} seconds.".format(time() - start))
+  def __filter_scores__(self, verbose=True):
+    '''
+    Filter the socres in self.score_names by criteria and store the filtered scores list in self.score_names
+
+    Args:
+      multi_proc (bool): Whether to use multiprocessing.
+    '''
+    if verbose:
+      start = time()
+      print("Filtering by number of parts...")
+    pool = Pool(max(1, os.cpu_count() - 1))
+    output = pool.map(self.__has_four_parts__, self.score_names)
+    pool.close()
+    pool.join()
+    score_names = [ score for four_parts, score in output if four_parts]
+    self.score_names = score_names
+
+    if verbose: print("Took {:.2f} seconds.".format(time() - start))
 
   def __get_path__(self, fn):
+    '''
+    Return the full path of the file given a file name.
+
+    Args:
+      fn (string): File name.
+    '''
     return self.data_dir + "/" + fn
 
   def __has_four_parts__(self, score_or_fn):
     '''
     Checks if the score has four parts or not. Some of them only have 4.
     Optionally adds the score to the queue.
+
+    Args:
+      score_or_fn (music21.stream.Score or string): The Score object or the file name of the score to be checked.
+
+    Returns:
+      bool, music21.stream.Score or string: A tuple of boolean specifying whether the particular score has four parts, as well as the input.
     '''
     num_parts = 4
     if type(score_or_fn) is Score:
@@ -58,6 +76,7 @@ class HaydnQuartetRawDataset(Dataset):
     else:
       path = self.__get_path__(score_or_fn)
       result = len(converter.thaw(path)) == num_parts
+
     return result, score_or_fn
 
 if __name__ == '__main__':
