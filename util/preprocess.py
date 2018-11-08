@@ -1,10 +1,20 @@
+import torch
 import numpy as np
+from analysis import MusicAnalysis
 
-class Transform(object):
-  def __call__(self, sample):
+class DataTransform(object):
+  def __call__(self, **kwargs):
     raise Exception("Do not use Transform directly, instead subclass from this class.")
 
-class ToTensorWithoutRhythm(Transform):
+class DataToTensor16thMin(DataTransform):
+  def __call__(self, sample, analysis={}):
+    '''
+    '''
+    lower_bound, upper_bound = \
+      analysis.get("lower_bound", 12), analysis.get("upper_bound", 100)
+    import pdb; pdb.set_trace()
+
+class DataToTensorWithoutRhythm(DataTransform):
   def __call__(self, sample):
     '''
     Converts the sample clip to a simple tensor that contain only pitches and no duration.
@@ -27,4 +37,4 @@ class ToTensorWithoutRhythm(Transform):
       pitches = list(map(int, pitches))
       parts[idx][pitches] = 1
 
-    return np.array(parts, dtype=np.float16)
+    return torch.HalfTensor(parts, dtype=np.float16)

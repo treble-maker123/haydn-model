@@ -1,45 +1,54 @@
 import os
 import numpy as np
-from functools import reduce
 from time import time
-from dataset import HaydnQuartetRawDataset
+from functools import reduce
+from multiprocessing import Pool
 
 class MusicAnalysis:
-  def __init__(self):
-    self.dataset = HaydnQuartetRawDataset()
-
-  def min_max_pitch(self, verbose=True):
-    '''
-    Computes the min and the max pitch step in the dataset.
-
-    Returns:
-      float, float: A tuple containing the minimum and maximum pitch step, in that order.
-    '''
-    if verbose:
-      start = time()
-      print("Finding min/max pitches...")
-    pitches = self.to_pitch_steps()
-    max_pitch = reduce(max, reduce(max, reduce(max, pitches)))
-    min_pitch = reduce(min, reduce(min, reduce(min, pitches)))
-    if verbose:
-      print("Took {:.2f} seconds.".format(time() - start))
-    return min_pitch, max_pitch
+  def __init__(self, dataset, **kwargs):
+    self.cache = {
+      "lower_bound": None,
+      "upper_bound": None
+    }
+    self._dataset = dataset
+    self._compute_min_max_pitch()
 
   def to_pitch_steps(self, verbose=True):
     '''
-    Turns the dataset into a nested List of pitch steps. The Lists have the dimensions (# of pieces) x (# of parts) x (# of notes).
+    Turns the dataset into a nested List of pitch steps. The Lists have the
+    dimensions (# of pieces) x (# of parts) x (# of notes).
 
     Returns:
       List: A multi-dimensional of List containing the pitch steps.
     '''
-    return list(map(self.__score_to_pitch_steps__, self.dataset))
+    return list(map(self._score_to_pitch_steps, self._dataset))
 
-  def __score_to_pitch_steps__(self, score, verbose=True):
-    return list(map(self.__part_to_pitch_steps__, score.parts))
+  def _compute_min_max_pitch(self, verbose=True):
+    '''
+    Computes the min and the max pitch step in the dataset.
 
-  def __part_to_pitch_steps__(self, part, verbose=True):
+    Returns:
+      float, float: A tuple containing the minimum and maximum pitch step, in
+      that order.
+    '''
+    # Default for Haydn quartets
+    self.cache["lower_bound"], self.cache["upper_bound"] = 38.0, 89.0
+    return
+
+    if self.cache["lower_bound"] and self.cache["upper_bound"]:
+      return self.cache["lower_bound"], self.cache["upper_bound"]
+
+    if verbose:
+      start = time()
+      print("Finding min/max pitches...")
+    pitches = self.to_pitch_steps()
+    self.cache["upper_bound"] = reduce(max, reduce(max, reduce(max, pitches)))
+    self.cache["lower_bound"] = reduce(min, reduce(min, reduce(min, pitches)))
+    if verbose:
+      print("Took {:.2f} seconds.".format(time() - start))
+
+  def _score_to_pitch_steps(self, score, verbose=True):
+    return list(map(self._part_to_pitch_steps, score.parts))
+
+  def _part_to_pitch_steps(self, part, verbose=True):
     return list(map(lambda x: x.ps, part.pitches))
-
-if __name__ == '__main__':
-  analysis = MusicAnalysis()
-  result = analysis.min_max_pitch()

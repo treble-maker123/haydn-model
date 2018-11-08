@@ -1,37 +1,51 @@
 import os
+import json
+from time import time
 from torch.utils.data import Dataset
 from music21 import converter
 from music21.stream import Score
-from time import time
 from multiprocessing import Pool
-from preprocess import Transform, ToTensorWithoutRhythm
+from preprocess import DataTransform
 
 class HaydnQuartetRawDataset(Dataset):
   '''
-  A class for interacting with the dataset. All preprocessing classes can inherit this class.
+  A class for interacting with the Haydn string quartet dataset.
   '''
 
   def __init__(self, **kwargs):
-    transform = kwargs.get('transform', None)
-    filtered = kwargs.get('filtered', True)
+    self.transform = kwargs.get('transform', None)
+    self.analysis = kwargs.get('analysis', None)
+    self.analysis_cache = {}
+
+    # check that there are data
     self.data_dir = kwargs.get('data_dir', "data/scores")
     self.score_names = os.listdir(self.data_dir)
-    if transform and transform.__bases__[0] is Transform:
-      self.transform = transform() # used in __getitem__()
-    else:
-      self.transform = None
     if len(self.score_names) == 0: raise Exception("No scores found!")
-    if filtered: self.__filter_scores__()
+
+    # filtering scores
+    filtered = kwargs.get('filtered', True)
+    if filtered: self._filter_scores()
+
+    # apply the analysis object, needs to be before transform
+    if self.analysis and self.analysis.__name__ is "MusicAnalysis":
+      self.analysis = self.analysis(self)
+      self.analysis_cache = self.analysis.cache
+
+    # saves the Transform object
+    if self.transform and self.transform.__bases__[0] is DataTransform:
+      self.transform = self.transform() # used in __getitem__()
 
   def __len__(self):
     return len(self.score_names)
 
   def __getitem__(self, idx):
-    score = converter.thaw(self.__get_path__(self.score_names[idx]))
-    if self.transform: score = self.transform(score)
+    score = converter.thaw(self._get_path(self.score_names[idx]))
+    # is transforming and has initalized
+    if self.transform and not type(self.transform) == type:
+      score = self.transform(score, self.analysis_cache)
     return score
 
-  def __filter_scores__(self, verbose=True):
+  def _filter_scores(self, verbose=True):
     '''
     Filter the socres in self.score_names by criteria and store the filtered scores list in self.score_names
 
@@ -42,7 +56,7 @@ class HaydnQuartetRawDataset(Dataset):
       start = time()
       print("Filtering by number of parts...")
     pool = Pool(max(1, os.cpu_count() - 1))
-    output = pool.map(self.__has_four_parts__, self.score_names)
+    output = pool.map(self._has_four_parts, self.score_names)
     pool.close()
     pool.join()
     score_names = [ score for four_parts, score in output if four_parts]
@@ -50,7 +64,7 @@ class HaydnQuartetRawDataset(Dataset):
 
     if verbose: print("Took {:.2f} seconds.".format(time() - start))
 
-  def __get_path__(self, fn):
+  def _get_path(self, fn):
     '''
     Return the full path of the file given a file name.
 
@@ -59,7 +73,7 @@ class HaydnQuartetRawDataset(Dataset):
     '''
     return self.data_dir + "/" + fn
 
-  def __has_four_parts__(self, score_or_fn):
+  def _has_four_parts(self, score_or_fn):
     '''
     Checks if the score has four parts or not. Some of them only have 4.
     Optionally adds the score to the queue.
@@ -74,10 +88,7 @@ class HaydnQuartetRawDataset(Dataset):
     if type(score_or_fn) is Score:
       result = len(score_or_fn) == num_parts
     else:
-      path = self.__get_path__(score_or_fn)
+      path = self._get_path(score_or_fn)
       result = len(converter.thaw(path)) == num_parts
 
     return result, score_or_fn
-
-if __name__ == '__main__':
-  dataset = HaydnQuartetRawDataset(transform=ToTensorWithoutRhythm)

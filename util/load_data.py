@@ -52,26 +52,26 @@ def download_data(max_download=5, pause=1, verbose=True):
         int: Number of works downloaded.
     '''
     downloaded = 0
-    index = __load_index__()
+    index = _load_index()
     works = index['works']
     for work in works:
         for i, mvmt in enumerate(work['movements']):
             if downloaded >= max_download:
                 if verbose:
-                    total_indexed, total_downloads = __file_stats__()
+                    total_indexed, total_downloads = _file_stats()
                     print("Downloaded {} for this run, {}/{} downloaded."
                             .format(downloaded, total_downloads, total_indexed))
                 return downloaded
 
-            name = __get_file_name__(work['key'], work['catalogue'], i + 1)
-            downloaded_files = __get_all_downloaded_file_names__()
+            name = _get_file_name(work['key'], work['catalogue'], i + 1)
+            downloaded_files = _get_all_downloaded_file_names()
             if name in downloaded_files or bool(mvmt.get('downloaded', False)):
                 if verbose:
                     print("Already downloaded {}, skipped.".format(name))
                 continue
 
             url = mvmt['url']
-            success, _ = __download_file__(url, name, "data/", verbose)
+            success, _ = _download_file_(url, name, "data/", verbose)
             if not success: return print("Terminating download.")
             downloaded += 1
             sleep(pause)
@@ -81,41 +81,41 @@ def list_downloaded_data():
     Returns:
         list: A list of strings containing the names of the downloade files.
     '''
-    return __get_all_downloaded_file_names__()
+    return _get_all_downloaded_file_names()
 
-def __file_stats__():
+def _file_stats():
     '''
     Returns:
         (int, int): The number of files recorded in index.json, and the number of files that are downloaded locally.
     '''
-    indexed_files = __get_all_indexed_file_names__()
-    downloaded_files = __get_all_downloaded_file_names__()
+    indexed_files = _get_all_indexed_file_names()
+    downloaded_files = _get_all_downloaded_file_names()
     return len(indexed_files), len(downloaded_files)
 
-def __get_all_downloaded_file_names__():
+def _get_all_downloaded_file_names():
     '''
     Returns:
         list: A list of all files that are saved in data/ directory.
     '''
-    indexed_files = __get_all_indexed_file_names__()
+    indexed_files = _get_all_indexed_file_names()
     files_in_data = os.listdir('data')
     return list(set(indexed_files).intersection(set(files_in_data)))
 
-def __get_all_indexed_file_names__():
+def _get_all_indexed_file_names():
     '''
     Returns:
         list: A list of all file names based on data/index.json.
     '''
     files = []
-    index = __load_index__()
+    index = _load_index()
     works = index['works']
     for work in works:
         for i, _ in enumerate(work['movements']):
-            filename = __get_file_name__(work['key'], work['catalogue'], i + 1)
+            filename = _get_file_name(work['key'], work['catalogue'], i + 1)
             files.append(filename)
     return files
 
-def __download_file__(url, name, path, verbose=True):
+def _download_file(url, name, path, verbose=True):
     '''
     Downloads a file from the web and save it locally.
 
@@ -140,7 +140,7 @@ def __download_file__(url, name, path, verbose=True):
             print("Failed to download {} with the following error: {}.".format(url, error))
         return False, error
 
-def __get_file_name__(key, catalogue, mvmt):
+def _get_file_name(key, catalogue, mvmt):
     '''
     Returns a string containing the name for the given work. The file name has the following structure,
         key_catalogue_m.mid
@@ -157,7 +157,7 @@ def __get_file_name__(key, catalogue, mvmt):
     out = key + "_" + catalogue +"_m" + str(mvmt) + ".mid"
     return out.replace(" ", "_")
 
-def __load_index__():
+def _load_index():
     '''
     Returns a dictionary of all of the data compiled in data/index.json.
 
