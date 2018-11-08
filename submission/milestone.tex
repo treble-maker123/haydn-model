@@ -1,0 +1,59 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Symbolic Music Composition Through Joint Sampling of Model Ensemble}
+\author{
+  Ziqiang Guan, Xiaohan Ding\\
+  University of Massachusetts, Amherst \\
+  College of Information and Computer Science \\
+  {\tt\small \{zguan, xding\}@cs.umass.edu}
+}
+
+\cvprfinalcopy
+\def\cvprPaperID{****}
+
+\begin{document}
+  \maketitle
+
+  \section{Introduction}
+  Music composition with neural networks has become a popular subject of research within the past decade. Many methods were deployed with the goal of assembling a model that could learn and produce music convincing enough to be comparable to those written by human composers.
+
+  The main challenge in this domain comes from the fact that music is multi-dimensional. At the micro level, music is primarily a fusion of pitch, rhythm, and harmony. At the macro level, phrases, counterpoint, and form add interest to music and enhance the experience for the listener.
+
+  A plethora of neural network architectures have been tested to model various aspects of music, but most have fallen short of being able to produce convincing music. This work hopes to unify the few exceptional cases to produce a general method for music generation that can be applied across various genres and settings.
+
+  \section{Problem Statement}
+  Producing a scalable neural network framework for music composition that lead to convincing music.
+
+  \vspace{4mm}
+  Thus far, We have collected a dataset from the web, which consist of most of Haydn's string quartets, as well as written code to preprocess the data. We chose Haydn's string quartets because we wanted a training source that is large, multi-part, relatively homogenous, and more rhythmically complex than J.S. Bach's chorales. However, we are not certain that the data we collected will be enough, and may supplement our experiement with piano music from www.piano-midi.de.
+
+  We expect our proposed method to have richer musical complexity than other models due to our separate treatment of the various aspects of music. We will use a qualitative approach to evaluate our methods, by performing Turing test on the samples generated from our models. While it is possible to evaluate our models quantitatively, such as training a GAN on a dataset, and use the discriminator to evaluate our results, the approach would take too long.
+
+  \section{Technical Approach}
+  We are using multiple neural networks, each learning one aspect of music, such as pitch or rhythmic patterns, and composing by joint-sampling from all of the networks using an approach similar to that of Gibbs sampling.
+
+  To jump start the composition process, one or a few of the networks is used to generate a piece of music, which serve as a starting point. Then notes are randomly drawn from the starting point and adjusted by re-sampling from all of the networks.
+
+  \vspace{4mm}
+  This approach has a few benefits over existing methods,
+  \begin{itemize}
+    \item \textbf{Flexibility of representation.} Because we are performing joint-sampling from multiple models, we can train separate models to focus on a specific aspect of music, such as rhythm or pitch patterns, or a combination of them, and adjust their contribution to the final output based on the perceived role (main melodic line vs. accompaniment) of the part,
+    \item \textbf{More insight into the composition process.} Many approaches use a single neural network to generate music. Because of the difficulty associated with interpreting the weights, it is difficult to understand what the neural network is doing. With the ensemble method, we can break down the network into parts and glean some insight from, as well as have more control, over the composition process,
+    \item \textbf{Endless combination, endless possibility.} It is conceivable to have separate models trained on different instrumentation to produce music . For example, pianists can play alternating notes of an octave or more apart, quickly with relative ease (such is done in Liszt's La Campanella), but an instrument such as the oboe would have difficulty achieving such a feat.
+  \end{itemize}
+
+  \section{Preliminary Results}
+  There are no preliminary results at this time due to complication with data collection and preprocessing, as well as unfamiliarity with the data format. There is no existing usable dataset of Haydn string quartets, so we had to collect them from a website and apply various preprocessing. We will likely switch to a more widely available dataset if we cannot make fast enough progress before the weekend.
+  % {
+  %   \small
+  %   \bibliographystyle{ieee}
+  %   \bibliography{egbib}
+  % }
+\end{document}

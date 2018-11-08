@@ -15,3 +15,15 @@ __pycache__/
 
 # No notebook checkpoints
 .ipynb_checkpoints/
+
+# Auxiliary files to ignore in submission
+submission/egpaper_final.tex
+submission/egpaper_for_review.tex
+submission/ieee.bst
+submission/*.aux
+submission/*.fdb_latexmk
+submission/*.fls
+submission/*.log
+submission/*.synctex.gz
+submission/*.bbl
+submission/*.blg
