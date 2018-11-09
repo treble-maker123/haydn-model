@@ -27,3 +27,10 @@ submission/*.log
 submission/*.synctex.gz
 submission/*.bbl
 submission/*.blg
+
+# Archive files
+archive
+archive/*
+
+# Random output files
+input.txt
