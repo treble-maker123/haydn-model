@@ -7,12 +7,29 @@ class DataTransform(object):
     raise Exception("Do not use Transform directly, instead subclass from this class.")
 
 class DataToTensor16thMin(DataTransform):
+  QUARTER_LEN = 1.0 # per music21 documentation
+  MIN_LEN = 0.25
+
   def __call__(self, sample, analysis={}):
-    '''
-    '''
     lower_bound, upper_bound = \
       analysis.get("lower_bound", 12), analysis.get("upper_bound", 100)
-    import pdb; pdb.set_trace()
+    not_over = True
+
+    parts = [[]] * len(sample.parts)
+    parts_note_idx = [0] * len(sample.parts)
+    cur_notes = []
+    for idx, part in enumerate(sample.parts):
+      try:
+        cur_notes.append(part.notesAndRests[0])
+      except:
+        cur_notes.append(None)
+
+    while not_over:
+      time_slice = 0
+
+      import pdb; pdb.set_trace()
+
+      time_slice = 1
 
 class DataToTensorWithoutRhythm(DataTransform):
   def __call__(self, sample):

@@ -23,7 +23,7 @@ class HaydnQuartetRawDataset(Dataset):
     if len(self.score_names) == 0: raise Exception("No scores found!")
 
     # filtering scores
-    filtered = kwargs.get('filtered', True)
+    filtered = kwargs.get('filter', True)
     if filtered: self._filter_scores()
 
     # apply the analysis object, needs to be before transform
