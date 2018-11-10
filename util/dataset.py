@@ -28,7 +28,16 @@ class PianoMidiDataset(Dataset):
     # create list of paths to the files
     paths = list(map(self._get_path, score_names))
     # get a list of MidiFile
-    self._dataset = list(map(MidiFile, paths))
+    def convert_file(file):
+      try:
+        return MidiFile(file)
+      except Exception as error:
+        print(error)
+        return None
+    self._dataset = list(map(convert_file, paths))
+    def keep_data(data):
+      return data and len(data.tracks) == 6
+    self._dataset = list(filter(keep_data, self._dataset))
     print("Loading data took {:.2f} seconds.".format(time() - start))
 
     self.chord_encoder = LabelEncoder()
