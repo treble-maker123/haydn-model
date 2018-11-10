@@ -31,10 +31,15 @@
   \section{Problem Statement}
   Producing a scalable neural network framework for music composition that lead to convincing music.
 
-  \vspace{4mm}
-  Thus far, We have collected a dataset from the web, which consist of most of Haydn's string quartets, as well as written code to preprocess the data. We chose Haydn's string quartets because we wanted a training source that is large, multi-part, relatively homogenous, and more rhythmically complex than J.S. Bach's chorales. However, we are not certain that the data we collected will be enough, and may supplement our experiement with piano music from www.piano-midi.de.
+  \subsection{Dataset}
+  Thus far, We have collected MIDI data from the web, which consist of most of Haydn's string quartets, as well as written code to preprocess the data. We chose Haydn's string quartets because we wanted a training source that is large, multi-part, relatively homogenous, and more rhythmically complex than J.S. Bach's chorales.
 
-  We expect our proposed method to have richer musical complexity than other models due to our separate treatment of the various aspects of music. We will use a qualitative approach to evaluate our methods, by performing Turing test on the samples generated from our models. While it is possible to evaluate our models quantitatively, such as training a GAN on a dataset, and use the discriminator to evaluate our results, the approach would take too long.
+  However, after exploring the dataset, we realized that it will take significant time to process the data, because there are many errors, and the formats are inconsisntent. We started cleaning another dataset from www.piano-midi.de, which has been used by others to generate music using neural networks. Specifically, we will be using only the piano music of Mozart, Haydn, Beehoven, and Clementi, because they use similar harmonic and melodic language.
+
+  \subsection{Expected Results and Evaluation}
+  We will use a qualitative approach to evaluate our methods, by performing Turing test on the samples generated from our models. We expect the output from our model to make less "mistakes", when compared to other models trained on similar repertoire, because the model allows for more aspects of music to be taken into consideration when sampling a note, and we will employ a mechanism to revise already sampled notes, so hopefully any "mistakes" in the first round of sampling can get corrected in subsequent sampling.
+
+  While it is possible to evaluate our models quantitatively, such as training a GAN on a dataset, and use the discriminator to evaluate our results, the approach would take too long.
 
   \section{Technical Approach}
   We are using multiple neural networks, each learning one aspect of music, such as pitch or rhythmic patterns, and composing by joint-sampling from all of the networks using an approach similar to that of Gibbs sampling.
@@ -50,7 +55,7 @@
   \end{itemize}
 
   \section{Preliminary Results}
-  There are no preliminary results at this time due to complication with data collection and preprocessing, as well as unfamiliarity with the data format. There is no existing usable dataset of Haydn string quartets, so we had to collect them from a website and apply various preprocessing. We will likely switch to a more widely available dataset if we cannot make fast enough progress before the weekend.
+  There are no preliminary results at this time due to complication with data collection and preprocessing, as well as unfamiliarity with the data format. There is no existing usable dataset of Haydn string quartets, so we had to collect them from various sources and apply preprocessing. The quality of music scrapped were subpar, therefore we have started processing existing datasets.
   % {
   %   \small
   %   \bibliographystyle{ieee}
