@@ -2,9 +2,11 @@ import os
 import itertools
 from time import time
 from mido import MidiFile
+from music21 import converter
 from pdb import set_trace
 from torch.utils.data import Dataset
 from sklearn.preprocessing import LabelEncoder
+from multiprocessing import Pool
 
 class PianoMidiDataset(Dataset):
   '''
@@ -21,14 +23,14 @@ class PianoMidiDataset(Dataset):
     print("Loading data...")
     # get a list of paths
     self._data_dir = kwargs.get('data_dir', "data")
-    # get a list of all of the file names
-    score_names = os.listdir(self._data_dir)
-    score_names = list(filter(lambda x: x[-3:]=="mid", score_names))
-    if len(score_names) == 0: raise Exception("No scores found!")
-    # create list of paths to the files
-    paths = list(map(self._get_path, score_names))
-    # get a list of MidiFile
-    self._dataset = list(map(MidiFile, paths))
+    # get a list of all of the file names in /data
+    file_paths = os.listdir(self._data_dir)
+    # only keep the ones end with "mid"
+    file_paths = list(filter(lambda x: x[-3:]=="mid", file_paths))
+    if len(file_paths) == 0: raise Exception("No midi files found!")
+    # get a list of music21 objects
+    # self._dataset = list(map(converter.parse, paths))
+    self._dataset = self._get_scores(file_paths)
     print("Loading data took {:.2f} seconds.".format(time() - start))
 
     self.chord_encoder = LabelEncoder()
@@ -39,6 +41,35 @@ class PianoMidiDataset(Dataset):
 
   def __getitem__(self, idx):
     return self._dataset[idx]
+
+  def _get_scores(self, paths, verbose=True):
+    '''
+    Convert midi files in self._data_dir directory into music21.stream.Score objects and serialize them into self._data_dir + "/scores".
+    '''
+    out_path = self._data_dir + "/scores"
+    if not os.path.exists(out_path):
+      os.mkdir(out_path)
+      print("Created directory \"{}\".".format(out_path))
+    else:
+      if verbose: print("Directory \"{}\" already exists.".format(out_path))
+
+    file_names = os.listdir(out_path)
+    file_names = list(map(lambda x: out_path + "/" + x, file_names))
+
+    scores = []
+    pool = Pool(max(1, os.cpu_count() - 1))
+    start = time()
+    if len(file_names) > 0:
+      if verbose: print("Serialized files found, thawing...")
+      scores = pool.map(converter.thaw, file_names)
+    else:
+      if verbose: print("Serialized files not found, converting midi...")
+      scores = pool.map(self._process_mid, paths)
+
+    pool.close()
+    pool.join()
+    print("Took {:.2f} seconds".format(time() - start))
+    return scores
 
   def _build_vocab(self):
     '''
@@ -116,11 +147,11 @@ class PianoMidiDataset(Dataset):
     token.sort()
     return tuple(token)
 
-  def _get_path(self, fn):
-    '''
-    Return the full path of the file given a file name.
-
-    Args:
-      fn (string): File name.
-    '''
-    return self._data_dir + "/" + fn
+  def _process_mid(self, file_name):
+    # convert to music21.stream.Score object
+    score = converter.parse(self._data_dir + "/" + file_name)
+    # replace ".mid" with ".pgz"
+    fn = file_name.split(".")[0] + ".pgz"
+    out_path = os.getcwd() + "/" + self._data_dir + "/scores/" + fn
+    converter.freeze(score, fp=out_path)
+    return score
