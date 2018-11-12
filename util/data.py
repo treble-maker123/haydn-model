@@ -67,9 +67,14 @@ def load_data(reload_data=False):
   print("Converting files into midis took {:.2f} seconds."
           .format(time() - start))
 
-  # filtering out the files that don't have 6 tracks
-  midis = list(filter(lambda m: len(m.tracks) != 6, midis))
-
+  # expecting track 1, 2, 3, 4 (index starts at 0) to contain the parts
+  def correct_format(midi):
+    key = "Viol"
+    return key in midi.tracks[1].name and \
+           key in midi.tracks[2].name and \
+           key in midi.tracks[3].name and \
+           key in midi.tracks[4].name
+  midis = list(filter(correct_format, midis))
   # save the results
   midi_files = midis
   file_paths = list(map(lambda m: m.filename, midis))
