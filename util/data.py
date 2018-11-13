@@ -107,8 +107,8 @@ class HaydnDataset(Dataset):
 
     # figure out pitch bounds
     pitches = list(map(self._score_to_pitches, self._scores))
-    max_pitch = reduce(max, reduce(max, reduce(max, pitches)))
-    min_pitch = reduce(min, reduce(min, reduce(min, pitches)))
+    max_pitch = max([max(max(part)) for part in pitches])
+    min_pitch = min([min(min(part)) for part in pitches])
     # +6 to allow room for transposition
     self._upper_bound = max_pitch + 6
     self._lower_bound = min_pitch - 6
@@ -192,13 +192,14 @@ class HaydnDataset(Dataset):
         notes_need_refresh = np.squeeze(
           np.argwhere(cur_dur < self.unit_length), axis=1)
         # articulate if is a new note
-        articulated = np.array([0] * 4)[notes_need_refresh] + 1
+        articulated = np.array([0] * 4)
+        articulated[notes_need_refresh] += 1
 
         if len(notes_need_refresh) > 0:
           # update the note idx for the parts that have new notes
           cur_note_idx[notes_need_refresh] += 1
-          # if there are no next notes, probably inconsistency in the score, break out early
-          # and not worry about the rest
+          # if there are no next notes, probably inconsistency in the score,
+          # break out early and not worry about the rest
           try:
             cur_notes = \
               [part.notesAndRests[idx] for part,idx in zip(parts,cur_note_idx)]
@@ -215,12 +216,48 @@ class HaydnDataset(Dataset):
             state = state[:, :current_tick, :]
             break
 
-        # pitches
+        # pitch assignment
         note_pitches = list(map(self._get_midi_value, cur_notes))
-        state[:, current_tick, note_pitches] = 1
-        # articulation
-        state[:, current_tick, -1][articulated] = 1
-        # TODO: MORE ELEMENTS HERE
+        state[:, current_tick][[0,1,2,3], note_pitches] = 1
+        # checks
+        # idx = state[:, current_tick, :self._pitch_span].argmax(axis=1)
+        # assert np.sum(idx == note_pitches) == 4, "Invalid pitch assignment."
 
+        # articulation
+        state[:, current_tick, -1] = articulated
+
+        # TODO: MORE ELEMENTS HERE
         cur_dur -= self.unit_length
-      return state
+
+      if state.shape[1] == 0: # no ticks in the dataset
+        return None
+
+      states = self._transpose_score(state)
+      return states
+
+  def _transpose_score(self, state):
+    transposed = np.zeros((13,) + state.shape)
+
+    try:
+      for step in range(-6, 7): # 7 because range end is exclusive
+        # get all of the one-hot encoded pitches
+        pitches = np.copy(state[:, :, :self._pitch_span-1])
+        # determine whether the vector contains a pitch, if it's a rest, then the
+        # sum of the vector would be 0
+        has_pitch = pitches.sum(axis=2) > 0
+        # turn the one-hot encoded values to midi value
+        midi_pitches = pitches.argmax(axis=2)
+        # transpose all of the pitches by step, mask out the locations where
+        # there weren't pitches with has_pitch
+        transposed_pitches = (midi_pitches + step) * has_pitch
+        # one-hot encode the pitches
+        num_pitch_classes = pitches.shape[2]
+        mask = np.repeat(has_pitch[:, :, None], num_pitch_classes, axis=2)
+        one_hot = np.eye(num_pitch_classes)[transposed_pitches] * mask
+        # save it, step+6 because step starts at -6
+        transposed[step+6, :, :, :self._pitch_span-1] = one_hot
+    except Exception as error:
+      print("Encountered {} at step {}.".format(error, step))
+      set_trace()
+
+    return transposed
