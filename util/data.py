@@ -7,9 +7,10 @@ from math import ceil
 from pdb import set_trace, pm
 from mido import MidiFile
 from functools import reduce
-from music21 import converter
+from music21 import converter, instrument
 from music21.chord import Chord
 from music21.note import Note, Rest
+from music21.stream import Score, Part
 from multiprocessing import Pool
 from torch.utils.data import Dataset
 
@@ -105,13 +106,13 @@ def load_data(reload_data=False):
 
     return score_files
 
-
 class HaydnDataset(Dataset):
     def __init__(self, data=None):
         start = time()
         print("Building dataset...")
+        # with quarter length being 1.0, 0.25 is the length of a 16th note in
+        # music21
         self.unit_length = 0.25
-
         self._scores = data
 
         # figure out pitch bounds
@@ -153,18 +154,21 @@ class HaydnDataset(Dataset):
         '''
         return sum(map(lambda n: n.duration.quarterLength, part.notesAndRests))
 
-    def _get_midi_value(self, note_or_chord):
+    def _midi_to_input(self, note_or_chord):
         if type(note_or_chord) is Chord:
             # return the highest note
-            return max(note_or_chord).pitch.midi - self._min_pitch + 1
+            return max(note_or_chord).pitch.midi - self._min_pitch
         elif type(note_or_chord) is Note:
             # return the note directly
-            return note_or_chord.pitch.midi - self._min_pitch + 1
+            return note_or_chord.pitch.midi - self._min_pitch
         elif type(note_or_chord) is Rest:
             # return pitch_span - 1, which is reserved for rest
             return self._pitch_span - 1
         else:
-            raise("Unrecognizablel input for note_or_chord to _get_midi_value")
+            raise("Unrecognizablel input for note_or_chord to _midi_to_input")
+
+    def _input_to_midi(self, input_val):
+        return input_val + self._min_pitch
 
     def _score_to_matrix(self, score, verbose=False):
         '''
@@ -232,7 +236,7 @@ class HaydnDataset(Dataset):
                     break
 
             # pitch assignment
-            note_pitches = list(map(self._get_midi_value, cur_notes))
+            note_pitches = list(map(self._midi_to_input, cur_notes))
             state[:, current_tick][np.arange(4), note_pitches] = 1
             if CHECK_ERROR:
                 # checks assignment is correct
@@ -242,23 +246,22 @@ class HaydnDataset(Dataset):
 
             # articulation
             state[:, current_tick, -1][notes_need_refresh] = 1
-            # remove articulation for rests
-            rests_idx = [ idx for idx, note in enumerate(cur_notes)
-                            if type(note) is Rest]
-            state[:, current_tick, -1][rests_idx] = 0
 
             # TODO: MORE ELEMENTS HERE
 
             # decrease the leftover duration of all of the notes
             cur_dur -= self.unit_length
 
+        if state.shape[1] == 0:  # no ticks in the dataset
+            return None
+
         if CHECK_ERROR:
             # each of the time slice dimensions should not sum to greater than 2
             assert (state.sum(axis=2) > 2).sum() <= 0, \
                     "Dimensions with sum greater than 2."
-
-        if state.shape[1] == 0:  # no ticks in the dataset
-            return None
+            # articulations for first tick should always be on
+            assert state[:, 0, -1].sum() == 4.0, \
+                    "Not starting with articulation."
 
         # transpose up and down half an octave in each direction
         transposed = self._transpose_score(state)
@@ -319,3 +322,62 @@ class HaydnDataset(Dataset):
             set_trace()
 
         return transposed
+
+    def matrix_to_score(self, matrix, verbose=False):
+        '''
+        Takes a matrix of (P, T, D) and turn it into a music21.stream.Score object, where P is the number of parts, T is the number of time slices, and dim is the note vector.
+        '''
+        # (4 parts, # ticks, self._pitch_span + 1)
+        assert len(matrix.shape) == 3, \
+            "Input matrix needs to have 3-dimensions."
+
+        num_parts, num_ticks, num_dim = matrix.shape
+        assert num_parts == 4, "Input matrix needs to have 4 parts."
+        assert num_ticks > 0, "No time slices in this matrix."
+        assert num_dim == self._pitch_span + 1, \
+                "Note vector size mismatch."
+
+        score = Score()
+        parts = list(map(self._matrix_to_part, matrix))
+        parts[0].insert(0, instrument.Violin())
+        parts[0].partName = "Violin I"
+        parts[1].insert(0, instrument.Violin())
+        parts[1].partName = "Violin II"
+        parts[2].insert(0, instrument.Viola())
+        parts[3].insert(0, instrument.Violoncello())
+        _ = list(map(lambda part: score.append(part), parts))
+
+        return score
+
+    def _matrix_to_part(self, submatrix):
+        '''
+        Takes a submatrix of size (T, D) and turn it into a music21.stream.Part
+        object, where T is the number of time slices, and dim is the note
+        vector.
+        '''
+        part = Part()
+        pitches = submatrix[:, :-1].argmax(axis=1)
+        articulations = submatrix[:, -1]
+
+        current_note = None
+        for current_tick in range(len(submatrix)):
+            if articulations[current_tick]: # if articulate
+                # append the old note
+                if current_note is not None: # for the first note
+                    part.append(current_note)
+
+                # create a new note
+                # last element is rest, so < (less than) to exclude last element
+                if pitches[current_tick] < self._pitch_span - 1:
+                    current_note = Note()
+                    # assign pitch, inverse of self._midi_to_input()
+                    current_note.pitch.midi = self._input_to_midi(
+                                                pitches[current_tick])
+                else:
+                    current_note = Rest()
+                # resets the duration to the smallest amount
+                current_note.duration.quarterLength = self.unit_length
+            else:
+                current_note.duration.quarterLength += self.unit_length
+
+        return part
