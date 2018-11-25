@@ -1,8 +1,10 @@
 import os
+import sys
+import traceback
 import numpy as np
 from time import time
 from math import ceil
-from pdb import set_trace
+from pdb import set_trace, pm
 from mido import MidiFile
 from functools import reduce
 from music21 import converter
@@ -12,6 +14,7 @@ from multiprocessing import Pool
 from torch.utils.data import Dataset
 
 DATA_DIR = "data"  # data folder name
+CHECK_ERROR = True # Will run all of the assert statements in the code
 
 file_names = []
 file_paths = []
@@ -113,12 +116,14 @@ class HaydnDataset(Dataset):
 
         # figure out pitch bounds
         pitches = list(map(self._score_to_pitches, self._scores))
-        max_pitch = max([max(max(part)) for part in pitches])
-        min_pitch = min([min(min(part)) for part in pitches])
+        self._max_pitch = max([max(max(part)) for part in pitches])
+        self._min_pitch = min([min(min(part)) for part in pitches])
         # +6 to allow room for transposition
-        self._upper_bound = max_pitch + 6
-        self._lower_bound = min_pitch - 6
-        # +1 for lowest note, and +1 for rest
+        self._upper_bound = self._max_pitch + 6
+        self._lower_bound = self._min_pitch - 6
+        # +1 for lowest note, +1 for rest
+        # Rest is included for easy manipulation, but will be removed during
+        # training
         self._pitch_span = self._upper_bound - self._lower_bound + 2
         print("Finished building dataset in {:.2f} seconds.".format(
             time() - start))
@@ -153,12 +158,15 @@ class HaydnDataset(Dataset):
     def _get_midi_value(self, note_or_chord):
         if type(note_or_chord) is Chord:
             # return the highest note
-            return max(note_or_chord).pitch.midi - self._lower_bound
+            return max(note_or_chord).pitch.midi - self._min_pitch + 1
         elif type(note_or_chord) is Note:
-            return note_or_chord.pitch.midi - self._lower_bound
-        else:
-            # last unit
+            # return the note directly
+            return note_or_chord.pitch.midi - self._min_pitch + 1
+        elif type(note_or_chord) is Rest:
+            # return pitch_span - 1, which is reserved for rest
             return self._pitch_span - 1
+        else:
+            raise("Unrecognizablel input for note_or_chord to _get_midi_value")
 
     def _score_to_matrix(self, score, verbose=False):
         '''
@@ -180,8 +188,6 @@ class HaydnDataset(Dataset):
         # current notes and their indices
         cur_notes = []
         cur_note_idx = np.array([-1] * 4)
-        # total number of notes and rests
-        # total_notes = list(map(lambda part: len(part.notesAndRests), parts))
         # keeping track of leftover duration of the current note
         cur_dur = np.array([0.0] * 4)
 
@@ -189,7 +195,8 @@ class HaydnDataset(Dataset):
         ticks = ceil(max_len / self.unit_length)
         # output dimension
         # 1st dim - num of parts
-        # 2nd dim - range of notes, rest, articulated
+        # 2nd dim - number of time slices or "ticks"
+        # 3rd dim - range of notes, +1 for articulation
         output_dim = (4, ticks, self._pitch_span + 1)
         # final state matrix
         state = np.zeros(output_dim, dtype=np.float16)
@@ -198,66 +205,101 @@ class HaydnDataset(Dataset):
             # check which note has run out of duration
             notes_need_refresh = np.squeeze(
                 np.argwhere(cur_dur < self.unit_length), axis=1)
-            # articulate if is a new note
-            articulated = np.array([0] * 4)
-            articulated[notes_need_refresh] += 1
 
             if len(notes_need_refresh) > 0:
                 # update the note idx for the parts that have new notes
                 cur_note_idx[notes_need_refresh] += 1
-                # if there are no next notes, probably inconsistency in the score,
-                # break out early and not worry about the rest
+                # if there are no next notes, probably inconsistency in the
+                # score, break out early and not worry about the rest
                 try:
                     cur_notes = \
                         [part.notesAndRests[idx]
                             for part, idx in zip(parts, cur_note_idx)]
+
                     # duration of all of the notes
                     durations = list(map(
                         lambda el: el.duration.quarterLength, cur_notes))
-                    # update the leftover duration of notes from parts that were just updated
+
+                    # update the leftover duration of notes from parts that
+                    # were just updated
                     cur_dur[notes_need_refresh] = \
                         np.array(durations)[notes_need_refresh]
                 except Exception as error:
                     if verbose:
                         print(error)
-                    # The parts aren't usually of the same length, so terminate once we
-                    # go through the shortest one and slice out the empty time columns.
+                    # The parts aren't usually of the same length, so terminate
+                    # once we go through the shortest one and slice out the
+                    # empty time columns.
                     state = state[:, :current_tick, :]
                     break
 
             # pitch assignment
             note_pitches = list(map(self._get_midi_value, cur_notes))
-            state[:, current_tick][[0, 1, 2, 3], note_pitches] = 1
-            # checks
-            # idx = state[:, current_tick, :self._pitch_span].argmax(axis=1)
-            # assert np.sum(idx == note_pitches) == 4, "Invalid pitch assignment."
+            state[:, current_tick][np.arange(4), note_pitches] = 1
+            if CHECK_ERROR:
+                # checks assignment is correct
+                idx = state[:, current_tick, :self._pitch_span].argmax(axis=1)
+                assert (idx == note_pitches).sum() == 4, \
+                    "Invalid pitch assignment."
 
             # articulation
-            state[:, current_tick, -1] = articulated
+            state[:, current_tick, -1][notes_need_refresh] = 1
+            # remove articulation for rests
+            rests_idx = [ idx for idx, note in enumerate(cur_notes)
+                            if type(note) is Rest]
+            state[:, current_tick, -1][rests_idx] = 0
 
             # TODO: MORE ELEMENTS HERE
+
+            # decrease the leftover duration of all of the notes
             cur_dur -= self.unit_length
+
+        if CHECK_ERROR:
+            # each of the time slice dimensions should not sum to greater than 2
+            assert (state.sum(axis=2) > 2).sum() <= 0, \
+                    "Dimensions with sum greater than 2."
 
         if state.shape[1] == 0:  # no ticks in the dataset
             return None
 
-        states = self._transpose_score(state)
-        return states
+        # transpose up and down half an octave in each direction
+        transposed = self._transpose_score(state)
+
+        # remove the rests for training, so last dimension should be
+        # of size self._pitch_bound, -1 for rest, +1 for articulation.
+        rest_removed = np.delete(transposed, -2, axis=3)
+
+        return transposed
 
     def _transpose_score(self, state):
         transposed = np.zeros((13,) + state.shape)
+        # number of ticks from all four parts
+        num_ticks = reduce(lambda x,y: x*y, state.shape[:2])
+        # number of array elements in state
+        total_elements = reduce(lambda x,y: x*y, state.shape)
 
         try:
             for step in range(-6, 7):  # 7 because range end is exclusive
-                # get all of the one-hot encoded pitches
-                pitches = np.copy(state[:, :, :self._pitch_span-1])
-                # determine whether the vector contains a pitch, if it's a rest, then the
-                # sum of the vector would be 0
+                # get all of the one-hot encoded pitches, -1 to exclude rest
+                pitches = state[:, :, :self._pitch_span-1].copy()
+
+                # determine whether the vector contains a pitch, if it's a rest
+                # then the sum of the vector would be 0
                 has_pitch = pitches.sum(axis=2) > 0
+                if CHECK_ERROR:
+                    # *not* has_pitch should match rest
+                    assert (~has_pitch == state[:,:,-2]).sum() == num_ticks, \
+                        "Mismatch between rests and empty pitches."
+
                 # turn the one-hot encoded values to midi value
                 midi_pitches = pitches.argmax(axis=2)
-                # transpose all of the pitches by step, mask out the locations where
-                # there weren't pitches with has_pitch
+                if CHECK_ERROR:
+                    # highest pitch should be less than self._pitch_span
+                    assert midi_pitches.max() < self._pitch_span, \
+                        "Max pitch is higher than pitch span."
+
+                # transpose all of the pitches by step, mask out the locations
+                # where there weren't pitches with has_pitch
                 transposed_pitches = (midi_pitches + step) * has_pitch
                 # one-hot encode the pitches
                 num_pitch_classes = pitches.shape[2]
@@ -265,9 +307,21 @@ class HaydnDataset(Dataset):
                     has_pitch[:, :, None], num_pitch_classes, axis=2)
                 one_hot = np.eye(num_pitch_classes)[transposed_pitches] * mask
                 # save it, step+6 because step starts at -6
+                # -1 to exclude rest
                 transposed[step+6, :, :, :self._pitch_span-1] = one_hot
+                # transfer the rests over
+                transposed[step+6, :, :, -2] = state[:, :, -2]
+                # transfer the articulations over
+                transposed[step+6, :, :, -1] = state[:, :, -1]
+
+                if CHECK_ERROR and step == 0:
+                    # tranposition with 0 step should be the same as the state.
+                    num_matches = (transposed[step+6] == state).sum()
+                    assert num_matches == total_elements, \
+                        "Mismatch between original state and transposed state."
         except Exception as error:
             print("Encountered {} at step {}.".format(error, step))
+            traceback.print_tb(error.__traceback__)
             set_trace()
 
         return transposed
