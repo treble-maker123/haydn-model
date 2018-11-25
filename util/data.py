@@ -122,8 +122,6 @@ class HaydnDataset(Dataset):
         self._upper_bound = self._max_pitch + 6
         self._lower_bound = self._min_pitch - 6
         # +1 for lowest note, +1 for rest
-        # Rest is included for easy manipulation, but will be removed during
-        # training
         self._pitch_span = self._upper_bound - self._lower_bound + 2
         print("Finished building dataset in {:.2f} seconds.".format(
             time() - start))
@@ -264,10 +262,6 @@ class HaydnDataset(Dataset):
 
         # transpose up and down half an octave in each direction
         transposed = self._transpose_score(state)
-
-        # remove the rests for training, so last dimension should be
-        # of size self._pitch_bound, -1 for rest, +1 for articulation.
-        rest_removed = np.delete(transposed, -2, axis=3)
 
         return transposed
 
