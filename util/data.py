@@ -339,6 +339,7 @@ class HaydnDataset(Dataset):
             "Note vector size mismatch."
 
         score = Score()
+        matrix[:, 0, -1] = [1,1,1,1]
         parts = list(map(self._matrix_to_part, matrix))
         parts[0].insert(0, instrument.Violin())
         parts[0].partName = "Violin I"
