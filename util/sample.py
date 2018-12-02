@@ -9,6 +9,7 @@ from functools import reduce
 #       sampling process 5120 times.
 num_repeats = 10
 
+
 def sample(**kwargs):
     '''
     Give the number of ticks (each tick is the length of an eighth note), use the model to populate the music.
@@ -20,14 +21,14 @@ def sample(**kwargs):
     num_dims = kwargs.get("num_dims", 73)
     # sequence length that the network takes in, default 2 measures
     seq_len = kwargs.get("seq_len", 32)
-    part_nums = [0,1,2,3]
+    part_nums = [0, 1, 2, 3]
 
     # models
     models = {}
     for part_num in part_nums:
         models["pitch_next_"+str(part_num)] = \
             kwargs.get("pitch_next_"+str(part_num), None)
-        models["pitch_prev_"+str(part_num)]= \
+        models["pitch_prev_"+str(part_num)] = \
             kwargs.get("pitch_prev_"+str(part_num), None)
         models["harmony_"+str(part_num)] = \
             kwargs.get("harmony_"+str(part_num), None)
@@ -39,7 +40,7 @@ def sample(**kwargs):
     result = np.zeros((num_parts, num_ticks, num_dims))
 
     # initialize the first time slice randomly
-    pitches = np.random.randint(0, 72, 4) # pitch between 0 and 71 inclusive
+    pitches = np.random.randint(0, 72, 4)  # pitch between 0 and 71 inclusive
     rhythm = np.random.randint(0, 2, 4)
     result[np.arange(num_parts), 0, pitches] = 1
     result[:, 0, -1] = rhythm
@@ -51,7 +52,7 @@ def sample(**kwargs):
                                                 part_num, models)
 
     # go back and revise it
-    num_cells = reduce(lambda x,y: x*y, result.shape[:-1])
+    num_cells = reduce(lambda x, y: x*y, result.shape[:-1])
     # number of "nodes" to revise
     max_iters = num_cells * num_repeats
     # list of indices to revise
@@ -101,6 +102,7 @@ def sample(**kwargs):
         result[i_part, i_tick, -1] = rm_output
 
     return result
+
 
 def _populate_part(num_ticks, num_dims, init_state, part_num=0, models={}):
     '''

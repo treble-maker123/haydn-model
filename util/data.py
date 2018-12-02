@@ -15,7 +15,7 @@ from multiprocessing import Pool
 from torch.utils.data import Dataset
 
 DATA_DIR = "data"  # data folder name
-CHECK_ERROR = True # Will run all of the assert statements in the code
+CHECK_ERROR = True  # Will run all of the assert statements in the code
 
 file_names = []
 file_paths = []
@@ -105,6 +105,7 @@ def load_data(reload_data=False):
         converter.freeze(file, fp=path)
 
     return score_files
+
 
 class HaydnDataset(Dataset):
     def __init__(self, data=None):
@@ -258,10 +259,10 @@ class HaydnDataset(Dataset):
         if CHECK_ERROR:
             # each of the time slice dimensions should not sum to greater than 2
             assert (state.sum(axis=2) > 2).sum() <= 0, \
-                    "Dimensions with sum greater than 2."
+                "Dimensions with sum greater than 2."
             # articulations for first tick should always be on
             assert state[:, 0, -1].sum() == 4.0, \
-                    "Not starting with articulation."
+                "Not starting with articulation."
 
         # transpose up and down half an octave in each direction
         transposed = self._transpose_score(state)
@@ -271,9 +272,9 @@ class HaydnDataset(Dataset):
     def _transpose_score(self, state):
         transposed = np.zeros((13,) + state.shape)
         # number of ticks from all four parts
-        num_ticks = reduce(lambda x,y: x*y, state.shape[:2])
+        num_ticks = reduce(lambda x, y: x*y, state.shape[:2])
         # number of array elements in state
-        total_elements = reduce(lambda x,y: x*y, state.shape)
+        total_elements = reduce(lambda x, y: x*y, state.shape)
 
         try:
             for step in range(-6, 7):  # 7 because range end is exclusive
@@ -285,7 +286,7 @@ class HaydnDataset(Dataset):
                 has_pitch = pitches.sum(axis=2) > 0
                 if CHECK_ERROR:
                     # *not* has_pitch should match rest
-                    assert (~has_pitch == state[:,:,-2]).sum() == num_ticks, \
+                    assert (~has_pitch == state[:, :, -2]).sum() == num_ticks, \
                         "Mismatch between rests and empty pitches."
 
                 # turn the one-hot encoded values to midi value
@@ -335,7 +336,7 @@ class HaydnDataset(Dataset):
         assert num_parts == 4, "Input matrix needs to have 4 parts."
         assert num_ticks > 0, "No time slices in this matrix."
         assert num_dim == self._pitch_span + 1, \
-                "Note vector size mismatch."
+            "Note vector size mismatch."
 
         score = Score()
         parts = list(map(self._matrix_to_part, matrix))
@@ -361,9 +362,9 @@ class HaydnDataset(Dataset):
 
         current_note = None
         for current_tick in range(len(submatrix)):
-            if articulations[current_tick]: # if articulate
+            if articulations[current_tick]:  # if articulate
                 # append the old note
-                if current_note is not None: # for the first note
+                if current_note is not None:  # for the first note
                     part.append(current_note)
 
                 # create a new note
@@ -372,7 +373,7 @@ class HaydnDataset(Dataset):
                     current_note = Note()
                     # assign pitch, inverse of self._midi_to_input()
                     current_note.pitch.midi = self._input_to_midi(
-                                                pitches[current_tick])
+                        pitches[current_tick])
                 else:
                     current_note = Rest()
                 # resets the duration to the smallest amount
