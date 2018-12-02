@@ -34,3 +34,5 @@ archive/*
 
 # Random output files
 input.txt
+
+outputs/*

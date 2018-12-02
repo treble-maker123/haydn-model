@@ -7,7 +7,7 @@ from math import ceil
 from pdb import set_trace, pm
 from mido import MidiFile
 from functools import reduce
-from music21 import converter, instrument
+from music21 import converter, instrument, clef
 from music21.chord import Chord
 from music21.note import Note, Rest
 from music21.stream import Score, Part
@@ -341,12 +341,20 @@ class HaydnDataset(Dataset):
         score = Score()
         matrix[:, 0, -1] = [1,1,1,1]
         parts = list(map(self._matrix_to_part, matrix))
+
         parts[0].insert(0, instrument.Violin())
         parts[0].partName = "Violin I"
+        parts[0].clef = clef.TrebleClef()
+
         parts[1].insert(0, instrument.Violin())
         parts[1].partName = "Violin II"
+        parts[1].clef = clef.TrebleClef()
+
         parts[2].insert(0, instrument.Viola())
+        parts[2].clef = clef.AltoClef()
+
         parts[3].insert(0, instrument.Violoncello())
+        parts[3].clef = clef.BassClef()
         _ = list(map(lambda part: score.append(part), parts))
 
         return score
