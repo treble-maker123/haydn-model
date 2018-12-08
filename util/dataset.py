@@ -126,6 +126,8 @@ class HaydnDataset(Dataset):
 
         # setting a larger size than actual range
         self.pitch_vocab_size = kwargs.get("pitch_vocab_size", 120)
+        # value of the rest pitch, should be 119 by default
+        self.rest = self.pitch_vocab_size - 1
 
     def __len__(self):
         return len(self._scores)
@@ -150,8 +152,7 @@ class HaydnDataset(Dataset):
             # return the note directly
             return note_or_chord.pitch.midi
         elif type(note_or_chord) is Rest:
-            # pitches are 0 - 119, 120 for rest
-            return self.pitch_vocab_size
+            return self.rest
         else:
             raise("Unrecognizablel input for note_or_chord to _midi_to_input")
 
@@ -250,8 +251,8 @@ class HaydnDataset(Dataset):
             pitches = state[:, :, 0].copy()
             # determine whether the vector contains a pitch, if it's a rest
             # then the sum of the vector would be 0
-            # rest is 120
-            has_pitch = pitches < self.pitch_vocab_size
+            # rest is 199
+            has_pitch = pitches < self.rest
             # transpose the pitches
             transposed = (pitches + step) * has_pitch
             # add the rests back
@@ -317,8 +318,8 @@ class HaydnDataset(Dataset):
                     part.append(current_note)
 
                 # create a new note
-                # -1 is rest, so if >= 0, it's a pitch
-                if pitches[current_tick] >= 0:
+                # 119 is rest, so if < 119, it's a pitch
+                if pitches[current_tick] < self.rest:
                     current_note = Note()
                     # assign pitch, inverse of self._midi_to_input()
                     current_note.pitch.midi = pitches[current_tick]
@@ -423,6 +424,9 @@ def assert_correct_sizes():
     assert len(comp_chunks) != 0, "Empty complementary chunks!"
     # seq_len x 2 + 1, x 2 for bidirectional, + 1 for the target note.
     assert chunks[5].shape == (4, (seq_len*2+1), 2), "Invalid chunk shape."
+    assert all_chunks[len(all_chunks)-1] is not None, "Invalid last chunk"
+    for chunk in all_chunks:
+        assert len(chunk.shape) == 3, "Invalid chunk!"
 
 if __name__ == "__main__":
     # dataset = HaydnDataset()
