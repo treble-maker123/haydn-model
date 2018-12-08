@@ -124,8 +124,8 @@ class HaydnDataset(Dataset):
         data = kwargs.get("data", load_data())
         self._scores = data[:10] if TEST_MODE else data
 
-        # size of the embedding vector
-        self.embed_size = kwargs.get("embed_size", 5)
+        # setting a larger size than actual range
+        self.pitch_vocab_size = kwargs.get("pitch_vocab_size", 120)
 
     def __len__(self):
         return len(self._scores)
@@ -150,8 +150,8 @@ class HaydnDataset(Dataset):
             # return the note directly
             return note_or_chord.pitch.midi
         elif type(note_or_chord) is Rest:
-            # return pitch_span - 1, which is reserved for rest
-            return -1
+            # pitches are 0 - 119, 120 for rest
+            return self.pitch_vocab_size
         else:
             raise("Unrecognizablel input for note_or_chord to _midi_to_input")
 
@@ -250,7 +250,8 @@ class HaydnDataset(Dataset):
             pitches = state[:, :, 0].copy()
             # determine whether the vector contains a pitch, if it's a rest
             # then the sum of the vector would be 0
-            has_pitch = pitches >= 0
+            # rest is 120
+            has_pitch = pitches < self.pitch_vocab_size
             # transpose the pitches
             transposed = (pitches + step) * has_pitch
             # add the rests back
@@ -334,6 +335,11 @@ class ChunksDataset(Dataset):
     def __init__(self, **kwargs):
         # length of each sequence or "ticks"
         self.seq_len = kwargs.get("seq_len", 32)
+        # number of time steps to slide for each chunk
+        self.stride = kwargs.get("stride", 1)
+        # length of the sliding window
+        # seq_len x 2 + 1 because bidirecitonal (x2) and prediction (+1)
+        self.win_len = self.seq_len * 2 + 1
         # sort the dataset out
         self.dataset = kwargs.get("dataset", None)
         # placeholder for complementary set
@@ -361,7 +367,7 @@ class ChunksDataset(Dataset):
                 num_datasets = len(dataset)
                 # number of items in this dataset
                 set_size = round(num_datasets * val_split) \
-                                if mode == "train" \
+                                if mode == "val" \
                                 else round(num_datasets * (1 - val_split))
                 all_idx = np.linspace(0, num_datasets, num_datasets,
                                       endpoint=False)
@@ -380,8 +386,10 @@ class ChunksDataset(Dataset):
 
         # number of chunks each piece has, each chunk is seq_len+1 long
         # +1 for validation, the network should take in seq_len values
-        self.num_chunks = list(map(lambda d,sq=self.seq_len: d.shape[2]//(sq+1),
-                                   self.dataset))
+        def calc_chunks(data, win_len=self.win_len, stride=self.stride):
+            num_ticks = data.shape[2]
+            return (num_ticks - win_len) // stride + 1
+        self.num_chunks = list(map(calc_chunks, self.dataset))
         # total number of chunks
         self.total_chunks = sum(self.num_chunks)
 
@@ -399,10 +407,10 @@ class ChunksDataset(Dataset):
                 chunk_idx -= self.num_chunks[corpus_idx]
             else:
                 corpus = self.dataset[corpus_idx]
-                chunk = np.s_[transpose_idx,
-                              :,
-                              chunk_idx:chunk_idx*self.seq_len+1,
-                              :]
+                # exclude the first chunk and last chunk
+                start_tick_idx = chunk_idx * self.stride
+                end_tick_idx = chunk_idx * self.stride + self.win_len
+                chunk = np.s_[transpose_idx,:,start_tick_idx:end_tick_idx,:]
                 return corpus[chunk]
 
 def assert_correct_sizes():
@@ -410,11 +418,11 @@ def assert_correct_sizes():
     chunks = ChunksDataset(dataset=dataset, mode="train", val_split=0.2)
     comp_chunks = ChunksDataset(dataset=chunks.comp_set)
     all_chunks = ChunksDataset(dataset=dataset, mode="all")
+    seq_len = all_chunks.seq_len
     assert len(chunks) != 0, "Empty chunks!"
     assert len(comp_chunks) != 0, "Empty complementary chunks!"
-    assert (len(chunks) + len(comp_chunks)) == len(all_chunks), \
-        "Chunk set sizes mismatch! Train: {}, comp: {}, all: {}" \
-            .format(len(chunks), len(comp_chunks), len(all_chunks))
+    # seq_len x 2 + 1, x 2 for bidirectional, + 1 for the target note.
+    assert chunks[5].shape == (4, (seq_len*2+1), 2), "Invalid chunk shape."
 
 if __name__ == "__main__":
     # dataset = HaydnDataset()
