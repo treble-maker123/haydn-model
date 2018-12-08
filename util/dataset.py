@@ -16,6 +16,10 @@ from torch.utils.data import Dataset
 
 DATA_DIR = "data"  # data folder name
 CHECK_ERROR = True  # Will run all of the assert statements in the code
+TEST_MODE = True # won't load as many data
+
+if TEST_MODE:
+    print("WARN: test mode is ON.")
 
 file_names = []
 file_paths = []
@@ -44,6 +48,7 @@ def load_data(reload_data=False):
     # get files ending in ".mid"
     file_names = list(
         filter(lambda fn: fn[-3:] == "pgz", os.listdir(DATA_DIR)))
+    if TEST_MODE: file_names = file_names[:10]
 
     if not reload_data and len(file_names) > 0:
         start = time()
@@ -108,25 +113,19 @@ def load_data(reload_data=False):
 
 
 class HaydnDataset(Dataset):
-    def __init__(self, data=None):
+    def __init__(self, **kwargs):
         start = time()
         print("Building dataset...")
         # with quarter length being 1.0, 0.25 is the length of a 16th note in
         # music21
         self.unit_length = 0.25
-        self._scores = data
 
-        # figure out pitch bounds
-        pitches = list(map(self._score_to_pitches, self._scores))
-        self._max_pitch = max([max(max(part)) for part in pitches])
-        self._min_pitch = min([min(min(part)) for part in pitches])
-        # +6 to allow room for transposition
-        self._upper_bound = self._max_pitch + 6
-        self._lower_bound = self._min_pitch - 6
-        # +1 for lowest note, +1 for rest
-        self._pitch_span = self._upper_bound - self._lower_bound + 2
-        print("Finished building dataset in {:.2f} seconds.".format(
-            time() - start))
+        # call the load_data method if no specific data is passed in.
+        data = kwargs.get("data", load_data())
+        self._scores = data[:10] if TEST_MODE else data
+
+        # size of the embedding vector
+        self.embed_size = kwargs.get("embed_size", 5)
 
     def __len__(self):
         return len(self._scores)
@@ -137,18 +136,6 @@ class HaydnDataset(Dataset):
         else:
             return None
 
-    def _score_to_pitches(self, score):
-        '''
-        Turns a score into Lists of MIDI pitches.
-        '''
-        return list(map(self._part_to_pitches, score))
-
-    def _part_to_pitches(self, part):
-        return list(
-            map(lambda el:
-                el.pitch.midi if type(el) is Note else max(el).pitch.midi,
-                part.flat.notes))
-
     def _calc_total_len(self, part):
         '''
         Calculate the total length of the part, length is fraction of quarter note time.
@@ -158,25 +145,22 @@ class HaydnDataset(Dataset):
     def _midi_to_input(self, note_or_chord):
         if type(note_or_chord) is Chord:
             # return the highest note
-            return max(note_or_chord).pitch.midi - self._min_pitch
+            return max(note_or_chord).pitch.midi
         elif type(note_or_chord) is Note:
             # return the note directly
-            return note_or_chord.pitch.midi - self._min_pitch
+            return note_or_chord.pitch.midi
         elif type(note_or_chord) is Rest:
             # return pitch_span - 1, which is reserved for rest
-            return self._pitch_span - 1
+            return -1
         else:
             raise("Unrecognizablel input for note_or_chord to _midi_to_input")
-
-    def _input_to_midi(self, input_val):
-        return input_val + self._min_pitch
 
     def _score_to_matrix(self, score, verbose=False):
         '''
         Transform the files in score_files into tensors.
 
         Args:
-            idx (int): The index of the score in score_files to turn into a state matrix.
+            score (music21.stream.Score)
 
         Returns:
             numpy.Array
@@ -199,10 +183,10 @@ class HaydnDataset(Dataset):
         # output dimension
         # 1st dim - num of parts
         # 2nd dim - number of time slices or "ticks"
-        # 3rd dim - range of notes, +1 for articulation
-        output_dim = (4, ticks, self._pitch_span + 1)
+        # 3rd dim - 2, 1 for midi pitch and 1 for articulation
+        output_dim = (4, ticks, 2)
         # final state matrix
-        state = np.zeros(output_dim, dtype=np.float16)
+        state = np.zeros(output_dim, dtype=np.int8)
 
         for current_tick in range(ticks):
             # check which note has run out of duration
@@ -238,15 +222,9 @@ class HaydnDataset(Dataset):
 
             # pitch assignment
             note_pitches = list(map(self._midi_to_input, cur_notes))
-            state[:, current_tick][np.arange(4), note_pitches] = 1
-            if CHECK_ERROR:
-                # checks assignment is correct
-                idx = state[:, current_tick, :self._pitch_span].argmax(axis=1)
-                assert (idx == note_pitches).sum() == 4, \
-                    "Invalid pitch assignment."
-
+            state[:, current_tick, 0] = note_pitches
             # articulation
-            state[:, current_tick, -1][notes_need_refresh] = 1
+            state[:, current_tick, 1][notes_need_refresh] = 1
 
             # TODO: MORE ELEMENTS HERE
 
@@ -257,9 +235,6 @@ class HaydnDataset(Dataset):
             return None
 
         if CHECK_ERROR:
-            # each of the time slice dimensions should not sum to greater than 2
-            assert (state.sum(axis=2) > 2).sum() <= 0, \
-                "Dimensions with sum greater than 2."
             # articulations for first tick should always be on
             assert state[:, 0, -1].sum() == 4.0, \
                 "Not starting with articulation."
@@ -270,76 +245,40 @@ class HaydnDataset(Dataset):
         return transposed
 
     def _transpose_score(self, state):
-        transposed = np.zeros((13,) + state.shape)
-        # number of ticks from all four parts
-        num_ticks = reduce(lambda x, y: x*y, state.shape[:2])
-        # number of array elements in state
-        total_elements = reduce(lambda x, y: x*y, state.shape)
-
-        try:
-            for step in range(-6, 7):  # 7 because range end is exclusive
-                # get all of the one-hot encoded pitches, -1 to exclude rest
-                pitches = state[:, :, :self._pitch_span-1].copy()
-
-                # determine whether the vector contains a pitch, if it's a rest
-                # then the sum of the vector would be 0
-                has_pitch = pitches.sum(axis=2) > 0
-                if CHECK_ERROR:
-                    # *not* has_pitch should match rest
-                    assert (~has_pitch == state[:, :, -2]).sum() == num_ticks, \
-                        "Mismatch between rests and empty pitches."
-
-                # turn the one-hot encoded values to midi value
-                midi_pitches = pitches.argmax(axis=2)
-                if CHECK_ERROR:
-                    # highest pitch should be less than self._pitch_span
-                    assert midi_pitches.max() < self._pitch_span, \
-                        "Max pitch is higher than pitch span."
-
-                # transpose all of the pitches by step, mask out the locations
-                # where there weren't pitches with has_pitch
-                transposed_pitches = (midi_pitches + step) * has_pitch
-                # one-hot encode the pitches
-                num_pitch_classes = pitches.shape[2]
-                mask = np.repeat(
-                    has_pitch[:, :, None], num_pitch_classes, axis=2)
-                one_hot = np.eye(num_pitch_classes)[transposed_pitches] * mask
-                # save it, step+6 because step starts at -6
-                # -1 to exclude rest
-                transposed[step+6, :, :, :self._pitch_span-1] = one_hot
-                # transfer the rests over
-                transposed[step+6, :, :, -2] = state[:, :, -2]
-                # transfer the articulations over
-                transposed[step+6, :, :, -1] = state[:, :, -1]
-
-                if CHECK_ERROR and step == 0:
-                    # tranposition with 0 step should be the same as the state.
-                    num_matches = (transposed[step+6] == state).sum()
-                    assert num_matches == total_elements, \
-                        "Mismatch between original state and transposed state."
-        except Exception as error:
-            print("Encountered {} at step {}.".format(error, step))
-            traceback.print_tb(error.__traceback__)
-            set_trace()
-
-        return transposed
+        result = np.zeros((13,) + state.shape)
+        for step in range(-6, 7):  # 7 because range end is exclusive
+            pitches = state[:, :, 0].copy()
+            # determine whether the vector contains a pitch, if it's a rest
+            # then the sum of the vector would be 0
+            has_pitch = pitches >= 0
+            # transpose the pitches
+            transposed = (pitches + step) * has_pitch
+            # add the rests back
+            transposed += ~has_pitch * -1
+            # move the pitches into result
+            result[step+6,:,:,0] = transposed
+            # move the rhythms into result
+            result[step+6,:,:,1] = state[:,:,1]
+        return result
 
     def matrix_to_score(self, matrix, verbose=False):
         '''
-        Takes a matrix of (P, T, D) and turn it into a music21.stream.Score object, where P is the number of parts, T is the number of time slices, and dim is the note vector.
+        Takes a matrix of (P, T, 2) and turn it into a music21.stream.Score object, where P is the number of parts, T is the number of time slices, and dim is the note vector.
         '''
-        # (4 parts, # ticks, self._pitch_span + 1)
+        # (4 parts, # ticks, 2)
         assert len(matrix.shape) == 3, \
             "Input matrix needs to have 3-dimensions."
 
         num_parts, num_ticks, num_dim = matrix.shape
         assert num_parts == 4, "Input matrix needs to have 4 parts."
         assert num_ticks > 0, "No time slices in this matrix."
-        assert num_dim == self._pitch_span + 1, \
-            "Note vector size mismatch."
+        assert num_dim == 2, "Note vector size mismatch."
+
+        # need to make sure all pieces start with an articulated note, even if
+        # it's a rest.
+        matrix[:, 0, 1] = [1,1,1,1]
 
         score = Score()
-        matrix[:, 0, -1] = [1,1,1,1]
         parts = list(map(self._matrix_to_part, matrix))
 
         parts[0].insert(0, instrument.Violin())
@@ -366,8 +305,8 @@ class HaydnDataset(Dataset):
         vector.
         '''
         part = Part()
-        pitches = submatrix[:, :-1].argmax(axis=1)
-        articulations = submatrix[:, -1]
+        pitches = submatrix[:, 0]
+        articulations = submatrix[:, 1]
 
         current_note = None
         for current_tick in range(len(submatrix)):
@@ -377,12 +316,11 @@ class HaydnDataset(Dataset):
                     part.append(current_note)
 
                 # create a new note
-                # last element is rest, so < (less than) to exclude last element
-                if pitches[current_tick] < self._pitch_span - 1:
+                # -1 is rest, so if >= 0, it's a pitch
+                if pitches[current_tick] >= 0:
                     current_note = Note()
                     # assign pitch, inverse of self._midi_to_input()
-                    current_note.pitch.midi = self._input_to_midi(
-                        pitches[current_tick])
+                    current_note.pitch.midi = pitches[current_tick]
                 else:
                     current_note = Rest()
                 # resets the duration to the smallest amount
@@ -391,3 +329,98 @@ class HaydnDataset(Dataset):
                 current_note.duration.quarterLength += self.unit_length
 
         return part
+
+class ChunksDataset(Dataset):
+    def __init__(self, **kwargs):
+        # length of each sequence or "ticks"
+        self.seq_len = kwargs.get("seq_len", 32)
+        # sort the dataset out
+        self.dataset = kwargs.get("dataset", None)
+        # placeholder for complementary set
+        self.comp_set = None
+
+        if self.dataset is None:
+            print("WARN: should pass in a dataset= argument for ChunksDataset to avoid duplicate instantiation of HaydnDataset.")
+            self.dataset = HaydnDataset()
+
+        # if the whole HaydnDataset is passed in, process and split it
+        if type(self.dataset) is HaydnDataset:
+            # filter out the blank/invalid datasets
+            dataset = list(filter(lambda ds: ds is not None, self.dataset))
+            # train gets 1 - val_split of the data, and val gets val_split data
+            mode = kwargs.get("mode", "train")
+            assert mode in ["train", "val", "all"], "Invalid mode."
+
+            if mode == "all":
+                self.dataset = dataset
+            else:
+                # percentage of data going to validations
+                val_split = kwargs.get("val_split", 0.2)
+                assert val_split < 1.0, "Invalid validation split value."
+
+                num_datasets = len(dataset)
+                # number of items in this dataset
+                set_size = round(num_datasets * val_split) \
+                                if mode == "train" \
+                                else round(num_datasets * (1 - val_split))
+                all_idx = np.linspace(0, num_datasets, num_datasets,
+                                      endpoint=False)
+                # random index for this set
+                set_idx = np.random.randint(0, num_datasets, set_size)
+                # complementary index, in all_idx but not set_idx
+                comp_set_idx = np.setdiff1d(all_idx, set_idx).astype("int8")
+                # update this set
+                self.dataset = [ dataset[idx] for idx in set_idx ]
+                # complementary set
+                self.comp_set = [ dataset[idx] for idx in comp_set_idx ]
+        elif type(self.dataset) is list:
+            pass
+        else:
+            raise Exception("Unrecognized chunk data type!")
+
+        # number of chunks each piece has, each chunk is seq_len+1 long
+        # +1 for validation, the network should take in seq_len values
+        self.num_chunks = list(map(lambda d,sq=self.seq_len: d.shape[2]//(sq+1),
+                                   self.dataset))
+        # total number of chunks
+        self.total_chunks = sum(self.num_chunks)
+
+    def __len__(self):
+        return 13 * self.total_chunks
+
+    def __getitem__(self, idx):
+        # [ num_chunks ], [ num_chunks ]... x num_transpose
+        transpose_idx = idx // self.total_chunks
+        chunk_idx = idx % self.total_chunks
+        for corpus_idx in range(len(self.dataset)):
+            # go through the chunks in each corpus, if the chunk index is
+            # greater than the chunks in the corpus, go to the next corpus.
+            if chunk_idx > self.num_chunks[corpus_idx]:
+                chunk_idx -= self.num_chunks[corpus_idx]
+            else:
+                corpus = self.dataset[corpus_idx]
+                chunk = np.s_[transpose_idx,
+                              :,
+                              chunk_idx:chunk_idx*self.seq_len+1,
+                              :]
+                return corpus[chunk]
+
+def assert_correct_sizes():
+    dataset = HaydnDataset()
+    chunks = ChunksDataset(dataset=dataset, mode="train", val_split=0.2)
+    comp_chunks = ChunksDataset(dataset=chunks.comp_set)
+    all_chunks = ChunksDataset(dataset=dataset, mode="all")
+    assert len(chunks) != 0, "Empty chunks!"
+    assert len(comp_chunks) != 0, "Empty complementary chunks!"
+    assert (len(chunks) + len(comp_chunks)) == len(all_chunks), \
+        "Chunk set sizes mismatch! Train: {}, comp: {}, all: {}" \
+            .format(len(chunks), len(comp_chunks), len(all_chunks))
+
+if __name__ == "__main__":
+    # dataset = HaydnDataset()
+    # data = dataset[2]
+    # score = dataset.matrix_to_score(dataset[2][6,:,:,:])
+    # score.show()
+
+    assert_correct_sizes()
+    pass
