@@ -58,13 +58,15 @@ class JudgeModel(nn.Module):
     '''
     def __init__(self, input_dim, hidden_dim, output_dim):
         super(JudgeModel, self).__init__()
-        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        num_notes, num_dim = input_dim
+        self.fc1 = nn.Linear(num_notes * num_dim, hidden_dim)
         nn.init.kaiming_normal_(self.fc1.weight)
         self.fc2 = nn.Linear(hidden_dim, output_dim)
         nn.init.kaiming_normal_(self.fc2.weight)
 
     def forward(self, X):
-        l1 = F.relu(self.fc1(X))
+        flatten = X.view(len(X), -1)
+        l1 = F.relu(self.fc1(flatten))
         return self.fc2(l1)
 
 class NoteModel(nn.Module):
@@ -80,7 +82,6 @@ class NoteModel(nn.Module):
         self.hidden = self.init_hidden()
 
         self.lstm = nn.LSTM(input_dim, self.hidden_dim)
-        nn.init.xavier_normal_(self.lstm.weight)
         self.pitch = nn.Linear(self.hidden_dim, vocab_size)
         nn.init.kaiming_normal_(self.pitch.weight)
         self.rhythm = nn.Linear(self.hidden_dim, 1)
@@ -145,7 +146,6 @@ def assert_note_model():
 
 if __name__ == "__main__":
     assert_harmony_model()
-    # assert_combine_model()
+    assert_judge_model()
     assert_pitch_embed_model()
     assert_note_model()
-    pass
