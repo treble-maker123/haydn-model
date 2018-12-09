@@ -48,8 +48,8 @@ def train(models, optims, loader, **kwargs):
                 forward_pitch, forward_rhythm, backward_pitch, harmony_pitch, harmony_part, judge_decision \
                     = forward_pass(models, X, part_idx, device=device, model_names=model_names)
             except Exception as error:
-                print("Ran into error in iteration {}, skipping"
-                        .format(num_iter))
+                print("Ran into error in iteration {}, skipping, \n{}"
+                        .format(num_iter, error))
                 continue
 
             # ===========================
