@@ -351,7 +351,7 @@ class ChunksDataset(Dataset):
             self.dataset = HaydnDataset()
 
         # if the whole HaydnDataset is passed in, process and split it
-        if type(self.dataset) is HaydnDataset:
+        if type(self.dataset).__name__ == "HaydnDataset":
             # filter out the blank/invalid datasets
             dataset = list(filter(lambda ds: ds is not None, self.dataset))
             # train gets 1 - val_split of the data, and val gets val_split data
@@ -371,9 +371,10 @@ class ChunksDataset(Dataset):
                                 if mode == "val" \
                                 else round(num_datasets * (1 - val_split))
                 all_idx = np.linspace(0, num_datasets, num_datasets,
-                                      endpoint=False)
+                                      endpoint=False, dtype=np.int8)
+                np.random.shuffle(all_idx)
                 # random index for this set
-                set_idx = np.random.randint(0, num_datasets, set_size)
+                set_idx = all_idx[:set_size]
                 # complementary index, in all_idx but not set_idx
                 comp_set_idx = np.setdiff1d(all_idx, set_idx).astype("int8")
                 # update this set
