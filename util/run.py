@@ -1,4 +1,5 @@
 import torch
+from time import time
 import torch.nn.functional as F
 from pdb import set_trace
 
@@ -31,6 +32,7 @@ def train(models, optims, loader, **kwargs):
         "p_accs": []
     }
 
+    start = time()
     for num_iter, X in enumerate(loader):
         X = X.to(device=device)
         batch_size, num_parts, win_len, _ = X.shape
@@ -38,7 +40,7 @@ def train(models, optims, loader, **kwargs):
         mid_idx = win_len // 2
 
         if num_iter % print_iter == 0:
-            print("Train iter {}:".format(num_iter))
+            print("Train iter {}/{}:".format(num_iter, len(loader)))
 
         for part_idx in range(num_parts):
             # zero out the gradients for all optimizers.
@@ -56,7 +58,7 @@ def train(models, optims, loader, **kwargs):
             # back-propagate
             # ===========================
             gt_pitch = X[:,part_idx,mid_idx,0].long()
-            gt_rhythm = X[:,part_idx,mid_idx,1]
+            gt_rhythm = X[:,part_idx,mid_idx,1].float()
             gt_part = torch.zeros(batch_size).long()
             gt_part[:] = part_idx
 
@@ -133,6 +135,11 @@ def train(models, optims, loader, **kwargs):
                     "\n\t\ttotal weighted loss: {:.5f}".format(loss.item())
                 )
 
+        if num_iter % print_iter == 0:
+            print("\tTraining time elapsed: {:.2f} seconds"
+                    .format(time() - start))
+            print("")
+
     return stats, models
 
 def validate(models, loader, **kwargs):
@@ -164,6 +171,7 @@ def validate(models, loader, **kwargs):
     }
 
     with torch.no_grad():
+        start = time()
         for num_iter, X in enumerate(loader):
             X = X.to(device=device)
             batch_size, num_parts, win_len, _ = X.shape
@@ -171,7 +179,7 @@ def validate(models, loader, **kwargs):
             mid_idx = win_len // 2
 
             if num_iter % print_iter == 0:
-                print("Valid iter {}:".format(num_iter))
+                print("Valid iter {}/{}:".format(num_iter, len(loader)))
 
             for part_idx in range(num_parts):
                 try:
@@ -185,7 +193,7 @@ def validate(models, loader, **kwargs):
                     continue
 
                 gt_pitch = X[:,part_idx,mid_idx,0].long()
-                gt_rhythm = X[:,part_idx,mid_idx,1]
+                gt_rhythm = X[:,part_idx,mid_idx,1].float()
                 gt_part = torch.zeros(batch_size).long()
                 gt_part[:] = part_idx
 
@@ -202,14 +210,6 @@ def validate(models, loader, **kwargs):
                 loss += fr * forward_rhythm_loss
                 loss += j * judge_loss
                 loss += p * part_loss
-
-                # detach the LSTM hidden states so don't need to retain graph
-                forward_model = models[model_names[0] + str(part_idx)]
-                backward_model = models[model_names[1] + str(part_idx)]
-                fm_h, fm_c = forward_model.hidden
-                bm_h, bm_c = backward_model.hidden
-                forward_model.hidden = fm_h.detach(), fm_c.detach()
-                backward_model.hidden = bm_h.detach(), bm_c.detach()
 
                 # calculate accuracy for each of the models
                 fp_acc = (forward_pitch.argmax(dim=1) == gt_pitch).sum()*100
@@ -257,7 +257,11 @@ def validate(models, loader, **kwargs):
                             .format(part_loss.item(), p_acc) +
                         "\n\t\ttotal weighted loss: {:.5f}".format(loss.item())
                     )
-                    print("")
+
+            if num_iter % print_iter == 0:
+                print("\t`Validation time elapsed: {:.2f} seconds"
+                    .format(time() - start))
+                print("`")
 
     return stats, models
 
@@ -282,7 +286,7 @@ def forward_pass(models, data, part_idx, **kwargs):
 
     part = data[:, part_idx, :, :]
     pitches = part[:, :, 0].long()
-    rhythms = part[:, :, 1]
+    rhythms = part[:, :, 1].float()
 
     # ===========================
     # forward and backward models
