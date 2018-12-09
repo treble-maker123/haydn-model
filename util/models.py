@@ -5,7 +5,8 @@ from pdb import set_trace
 
 # num of dimensions for embedding
 EMBED_DIM = 5
-# size of the pitch vocabulary, 120, 0 to 118 for midi pitches, 199 for rest
+# size of the pitch vocabulary, 0 to PITCH_VOCAB_SIZE-2 for midi pitches,
+# PITCH_VOCAB_SIZE - 1for rest.
 # REST IS A PITCH!
 PITCH_VOCAB_SIZE = 120
 # default batch size
@@ -13,7 +14,7 @@ BATCH_SIZE = 32
 
 class PitchEmbedModel(nn.Module):
     def __init__(self, vocab_size=PITCH_VOCAB_SIZE, embed_dim=EMBED_DIM):
-        super(PitchEmbedModel, self).__init__()
+        super().__init__()
         self.embed = nn.Embedding(vocab_size, embed_dim)
 
     def forward(self, X):
@@ -29,7 +30,7 @@ class HarmonyModel(nn.Module):
     '''
     def __init__(self, input_shape=(4,9),
                  vocab_size=PITCH_VOCAB_SIZE, **kwargs):
-        super(HarmonyModel, self).__init__()
+        super().__init__()
         # compress the representation for each part into latent vectors
         num_parts = input_shape[0]
         hidden_dim = kwargs.get("hidden_dim", 4)
@@ -57,7 +58,7 @@ class JudgeModel(nn.Module):
     Given three note suggestions, this model will judge which one to use.
     '''
     def __init__(self, input_dim, hidden_dim, output_dim):
-        super(JudgeModel, self).__init__()
+        super().__init__()
         num_notes, num_dim = input_dim
         self.fc1 = nn.Linear(num_notes * num_dim, hidden_dim)
         nn.init.kaiming_normal_(self.fc1.weight)
@@ -74,12 +75,12 @@ class NoteModel(nn.Module):
     Given a sequence of notes, this model will predict the next note.
     '''
     def __init__(self, input_dim, hidden_dim=100, **kwargs):
-        super(NoteModel, self).__init__()
+        super().__init__()
         vocab_size = kwargs.get("vocab_size", PITCH_VOCAB_SIZE)
+        batch_size = kwargs.get("batch_size", 32)
         self.num_layers = kwargs.get("num_layers", 1)
-        self.batch_size = kwargs.get("batch_size", 32)
         self.hidden_dim = hidden_dim
-        self.hidden = self.init_hidden()
+        self.hidden = self.init_hidden(batch_size=batch_size)
 
         self.lstm = nn.LSTM(input_dim, self.hidden_dim)
         self.pitch = nn.Linear(self.hidden_dim, vocab_size)
@@ -87,17 +88,23 @@ class NoteModel(nn.Module):
         self.rhythm = nn.Linear(self.hidden_dim, 1)
         nn.init.kaiming_normal_(self.rhythm.weight)
 
-    def init_hidden(self):
-        return (torch.zeros(self.num_layers, self.batch_size, self.hidden_dim),
-                torch.zeros(self.num_layers, self.batch_size, self.hidden_dim))
+    def init_hidden(self, batch_size=32):
+        return (torch.zeros(self.num_layers, batch_size, self.hidden_dim),
+                torch.zeros(self.num_layers, batch_size, self.hidden_dim))
 
     def forward(self, X):
+        # adjust the batch size according to the input
+        input_batch = X.shape[1]
+        hidden_batch = self.hidden[0].shape[1]
+        if input_batch != hidden_batch:
+            self.hidden = self.init_hidden(input_batch)
+
         # lstm.shape == [seq_len, batch_size, hidden_size]
         lstm, self.hidden = self.lstm(X, self.hidden)
         last_step = lstm[-1] # get only output from last time step
         pitch_scores = self.pitch(last_step)
         rhythm_scores = self.rhythm(last_step)
-        return pitch_scores, rhythm_scores
+        return pitch_scores, torch.sigmoid(rhythm_scores)
 
 def assert_pitch_embed_model():
     input_tensor = torch.randint(0, 88, (BATCH_SIZE,)).long()
@@ -107,13 +114,13 @@ def assert_pitch_embed_model():
 
 def assert_harmony_model():
     num_parts = 4
-    input_shape= (num_parts, (EMBED_DIM + 4))
+    input_shape= (num_parts, EMBED_DIM + 4)
     output_dim = PITCH_VOCAB_SIZE + 4
 
     input_tensor = torch.randint(0,88,(BATCH_SIZE,)+input_shape)
     harmony = HarmonyModel(input_shape, PITCH_VOCAB_SIZE)
     output = harmony(input_tensor)
-
+    set_trace()
     assert output.shape == (BATCH_SIZE, output_dim), \
         "Invalid output shape."
 

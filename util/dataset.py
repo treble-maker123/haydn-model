@@ -13,10 +13,12 @@ from music21.note import Note, Rest
 from music21.stream import Score, Part
 from multiprocessing import Pool
 from torch.utils.data import Dataset
+import torchvision.transforms as T
 
 DATA_DIR = "data"  # data folder name
 CHECK_ERROR = True  # Will run all of the assert statements in the code
-TEST_MODE = True # won't load as many data
+TEST_MODE = False # won't load as many data
+TESTING_SAMPLE = 4
 
 if TEST_MODE:
     print("WARN: test mode is ON.")
@@ -48,7 +50,7 @@ def load_data(reload_data=False):
     # get files ending in ".mid"
     file_names = list(
         filter(lambda fn: fn[-3:] == "pgz", os.listdir(DATA_DIR)))
-    if TEST_MODE: file_names = file_names[:10]
+    if TEST_MODE: file_names = file_names[:TESTING_SAMPLE]
 
     if not reload_data and len(file_names) > 0:
         start = time()
@@ -122,7 +124,7 @@ class HaydnDataset(Dataset):
 
         # call the load_data method if no specific data is passed in.
         data = kwargs.get("data", load_data())
-        self._scores = data[:10] if TEST_MODE else data
+        self._scores = data[:TESTING_SAMPLE] if TEST_MODE else data
 
         # setting a larger size than actual range
         self.pitch_vocab_size = kwargs.get("pitch_vocab_size", 120)
@@ -251,12 +253,11 @@ class HaydnDataset(Dataset):
             pitches = state[:, :, 0].copy()
             # determine whether the vector contains a pitch, if it's a rest
             # then the sum of the vector would be 0
-            # rest is 199
             has_pitch = pitches < self.rest
             # transpose the pitches
             transposed = (pitches + step) * has_pitch
             # add the rests back
-            transposed += ~has_pitch * -1
+            transposed += ~has_pitch * self.rest
             # move the pitches into result
             result[step+6,:,:,0] = transposed
             # move the rhythms into result
@@ -318,7 +319,6 @@ class HaydnDataset(Dataset):
                     part.append(current_note)
 
                 # create a new note
-                # 119 is rest, so if < 119, it's a pitch
                 if pitches[current_tick] < self.rest:
                     current_note = Note()
                     # assign pitch, inverse of self._midi_to_input()
@@ -333,7 +333,7 @@ class HaydnDataset(Dataset):
         return part
 
 class ChunksDataset(Dataset):
-    def __init__(self, **kwargs):
+    def __init__(self, transforms=None, **kwargs):
         # length of each sequence or "ticks"
         self.seq_len = kwargs.get("seq_len", 32)
         # number of time steps to slide for each chunk
@@ -381,6 +381,7 @@ class ChunksDataset(Dataset):
                 # complementary set
                 self.comp_set = [ dataset[idx] for idx in comp_set_idx ]
         elif type(self.dataset) is list:
+            # already in self.dataset
             pass
         else:
             raise Exception("Unrecognized chunk data type!")
@@ -393,6 +394,11 @@ class ChunksDataset(Dataset):
         self.num_chunks = list(map(calc_chunks, self.dataset))
         # total number of chunks
         self.total_chunks = sum(self.num_chunks)
+
+        if transforms is not None:
+            self.transforms = T.Compose(transforms)
+        else:
+            self.transforms = None
 
     def __len__(self):
         return 13 * self.total_chunks
@@ -408,11 +414,23 @@ class ChunksDataset(Dataset):
                 chunk_idx -= self.num_chunks[corpus_idx]
             else:
                 corpus = self.dataset[corpus_idx]
+
                 # exclude the first chunk and last chunk
                 start_tick_idx = chunk_idx * self.stride
                 end_tick_idx = chunk_idx * self.stride + self.win_len
-                chunk = np.s_[transpose_idx,:,start_tick_idx:end_tick_idx,:]
-                return corpus[chunk]
+                cidx = np.s_[transpose_idx,:,start_tick_idx:end_tick_idx,:]
+                chunk = corpus[cidx]
+
+                # pad it if it's not long enough
+                if chunk.shape[1] < self.win_len:
+                    diff = self.win_len - chunk.shape[1]
+                    chunk = np.pad(chunk,((0,0), (0,diff), (0,0)),
+                                   mode="constant")
+
+                if self.transforms is not None:
+                    chunk = self.transforms(chunk)
+
+                return chunk
 
 def assert_correct_sizes():
     dataset = HaydnDataset()
@@ -424,9 +442,20 @@ def assert_correct_sizes():
     assert len(comp_chunks) != 0, "Empty complementary chunks!"
     # seq_len x 2 + 1, x 2 for bidirectional, + 1 for the target note.
     assert chunks[5].shape == (4, (seq_len*2+1), 2), "Invalid chunk shape."
+    # make sure last chunk exists
     assert all_chunks[len(all_chunks)-1] is not None, "Invalid last chunk"
+    # make sure all chunks have three dims
     for chunk in all_chunks:
         assert len(chunk.shape) == 3, "Invalid chunk!"
+    # make sure all chunks are of length seq_len
+    lens = list(map(lambda x: x.shape[1], all_chunks))
+    parts = list(map(lambda x: x.shape[2], all_chunks))
+    wrong_lens = [ x for x in lens if x != (seq_len*2+1) ]
+    wrong_parts = [ x for x in parts if x != 2]
+    assert len(wrong_lens) == 0, "There are {} chunks with wrong lengths." \
+                                    .format(len(wrong_lens))
+    assert len(wrong_parts) == 0, \
+        "There are {} chunks with wrong parts.".format(len(wrong_parts))
 
 if __name__ == "__main__":
     # dataset = HaydnDataset()
