@@ -111,12 +111,12 @@ def train(models, optims, loader, **kwargs):
             stats['fr_losses'].append(forward_rhythm_loss.item())
             stats['j_losses'].append(judge_loss.item())
             stats['p_losses'].append(part_loss.item())
-            stats['fp_accs'].append(fp_acc)
-            stats['bp_accs'].append(bp_acc)
-            stats['hp_accs'].append(hp_acc)
-            stats['fr_accs'].append(fr_acc)
-            stats['j_accs'].append(j_acc)
-            stats['p_accs'].append(p_acc)
+            stats['fp_accs'].append(fp_acc.item())
+            stats['bp_accs'].append(bp_acc.item())
+            stats['hp_accs'].append(hp_acc.item())
+            stats['fr_accs'].append(fr_acc.item())
+            stats['j_accs'].append(j_acc.item())
+            stats['p_accs'].append(p_acc.item())
 
             if num_iter % print_iter == 0:
                 print(
@@ -233,12 +233,12 @@ def validate(models, loader, **kwargs):
                 stats['fr_losses'].append(forward_rhythm_loss.item())
                 stats['j_losses'].append(judge_loss.item())
                 stats['p_losses'].append(part_loss.item())
-                stats['fp_accs'].append(fp_acc)
-                stats['bp_accs'].append(bp_acc)
-                stats['hp_accs'].append(hp_acc)
-                stats['fr_accs'].append(fr_acc)
-                stats['j_accs'].append(j_acc)
-                stats['p_accs'].append(p_acc)
+                stats['fp_accs'].append(fp_acc.item())
+                stats['bp_accs'].append(bp_acc.item())
+                stats['hp_accs'].append(hp_acc.item())
+                stats['fr_accs'].append(fr_acc.item())
+                stats['j_accs'].append(j_acc.item())
+                stats['p_accs'].append(p_acc.item())
 
                 if num_iter % print_iter == 0:
                     print(
