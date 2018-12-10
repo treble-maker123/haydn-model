@@ -38,3 +38,5 @@ input.txt
 outputs/*
 samples/*
 submission/*
+
+**.wav
