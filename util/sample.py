@@ -53,7 +53,7 @@ def sample(models, **kwargs):
             pitch = judge_decision.squeeze(dim=0).argmax().item()
             result[i_part, center_idx, :] = [pitch, rhythm]
 
-        if (iter_i % 100) == 0:
+        if (iter_i % 1000) == 0:
             print("current iter: {x}/{y}".format(x=iter_i, y=max_iters))
 
     return result
