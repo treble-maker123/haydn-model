@@ -1,6 +1,6 @@
 from music21 import converter
 
 if __name__ == "__main__":
-    file_path = "./samples/EBC9FA_12-10_01-07-55.pgz"
+    file_path = "./outputs/6C0C1E_12-10_04-29-21.pgz"
     score = converter.thaw(file_path)
     score.show()
