@@ -16,18 +16,25 @@ def sample(models, **kwargs):
     vocab_size = kwargs.get("vocab_size", 140)
     # sequence length that the network takes in, default 2 measures
     seq_len = kwargs.get("seq_len", 32)
+    # number of iterations to sample
     num_repeats = kwargs.get("num_repeats", 1)
+    # already sampled input, for continued sampling
+    sampled_input = kwargs.get("sampled_input", None)
 
     part_nums = [0, 1, 2, 3]
 
     for key in models:
         models[key].eval()
 
-    result = np.zeros((num_parts, num_ticks, 2))
-
-    # initialize all of the parts
-    for part_num in part_nums:
-        result[part_num, :, :] = _populate_part(num_ticks, vocab_size)
+    if sampled_input is not None:
+        # use the input sample as a starting point
+        result = sampled_input
+    else:
+        # start with a new piece
+        result = np.zeros((num_parts, num_ticks, 2))
+        # initialize all of the parts
+        for part_num in part_nums:
+            result[part_num, :, :] = _populate_part(num_ticks, vocab_size)
 
     # go back and revise it
     num_cells = reduce(lambda x, y: x*y, result.shape[:-1])
