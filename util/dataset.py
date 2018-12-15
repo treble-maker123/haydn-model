@@ -245,9 +245,11 @@ class HaydnDataset(Dataset):
         # transpose up and down half an octave in each direction
         transposed = self._transpose_score(state)
 
-        return transposed
+        return state
 
     def _transpose_score(self, state):
+        return state[None, :, :, :] # no transposition
+
         result = np.zeros((13,) + state.shape)
         for step in range(-6, 7):  # 7 because range end is exclusive
             pitches = state[:, :, 0].copy()
