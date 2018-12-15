@@ -245,7 +245,7 @@ class HaydnDataset(Dataset):
         # transpose up and down half an octave in each direction
         transposed = self._transpose_score(state)
 
-        return state
+        return transposed
 
     def _transpose_score(self, state):
         return state[None, :, :, :] # no transposition
@@ -404,7 +404,7 @@ class ChunksDataset(Dataset):
             self.transforms = None
 
     def __len__(self):
-        return 13 * self.total_chunks
+        return self.total_chunks
 
     def __getitem__(self, idx):
         # [ num_chunks ], [ num_chunks ]... x num_transpose
