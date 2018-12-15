@@ -17,7 +17,7 @@ import torchvision.transforms as T
 
 DATA_DIR = "data"  # data folder name
 CHECK_ERROR = True  # Will run all of the assert statements in the code
-TEST_MODE = True # won't load as many data
+TEST_MODE = False # won't load as many data
 TESTING_SAMPLE = 3
 
 if TEST_MODE:
