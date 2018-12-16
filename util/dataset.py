@@ -189,7 +189,7 @@ class HaydnDataset(Dataset):
         # 3rd dim - 2, 1 for midi pitch and 1 for articulation
         output_dim = (4, ticks, 2)
         # final state matrix
-        state = np.zeros(output_dim, dtype=np.int8)
+        state = np.zeros(output_dim, dtype=np.uint8)
 
         for current_tick in range(ticks):
             # check which note has run out of duration
@@ -248,6 +248,8 @@ class HaydnDataset(Dataset):
         return transposed
 
     def _transpose_score(self, state):
+        return state[None, :, :, :] # no transposition
+
         result = np.zeros((13,) + state.shape)
         for step in range(-6, 7):  # 7 because range end is exclusive
             pitches = state[:, :, 0].copy()
@@ -371,12 +373,12 @@ class ChunksDataset(Dataset):
                                 if mode == "val" \
                                 else round(num_datasets * (1 - val_split))
                 all_idx = np.linspace(0, num_datasets, num_datasets,
-                                      endpoint=False, dtype=np.int8)
+                                      endpoint=False, dtype=np.uint8)
                 np.random.shuffle(all_idx)
                 # random index for this set
                 set_idx = all_idx[:set_size]
                 # complementary index, in all_idx but not set_idx
-                comp_set_idx = np.setdiff1d(all_idx, set_idx).astype("int8")
+                comp_set_idx = np.setdiff1d(all_idx, set_idx).astype("uint8")
                 # update this set
                 self.dataset = [ dataset[idx] for idx in set_idx ]
                 # complementary set
@@ -402,7 +404,7 @@ class ChunksDataset(Dataset):
             self.transforms = None
 
     def __len__(self):
-        return 13 * self.total_chunks
+        return self.total_chunks
 
     def __getitem__(self, idx):
         # [ num_chunks ], [ num_chunks ]... x num_transpose

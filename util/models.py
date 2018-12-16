@@ -120,7 +120,6 @@ def assert_harmony_model():
     input_tensor = torch.randint(0,88,(BATCH_SIZE,)+input_shape)
     harmony = HarmonyModel(input_shape, PITCH_VOCAB_SIZE)
     output = harmony(input_tensor)
-    set_trace()
     assert output.shape == (BATCH_SIZE, output_dim), \
         "Invalid output shape."
 
